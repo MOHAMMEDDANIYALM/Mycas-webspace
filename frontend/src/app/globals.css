@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  @apply bg-slate-50 text-slate-900;
+  @apply bg-white text-slate-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Dark mode styles for specific elements */
+.dark {
+  --color-bg: #111827;
+  --color-bg-secondary: #1f2937;
+  --color-text: #f3f4f6;
+  --color-text-secondary: #d1d5db;
+}
+
+/* Smooth transitions for theme */
+* {
+  @apply transition-colors duration-300;
 }

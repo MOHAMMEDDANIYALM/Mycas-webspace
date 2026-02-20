@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import ThemeToggle from './ThemeToggle';
 
 export default function PublicLanding() {
   return (
@@ -20,6 +21,19 @@ export default function PublicLanding() {
             <span className="text-lg font-bold text-blue-900">MYCAS Portal</span>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/about" className="text-blue-700 hover:text-blue-900 font-medium">
+              About
+            </Link>
+            <Link href="/departments" className="text-blue-700 hover:text-blue-900 font-medium">
+              Departments
+            </Link>
+            <Link href="/faculty" className="text-blue-700 hover:text-blue-900 font-medium">
+              Faculty
+            </Link>
+            <Link href="/contact" className="text-blue-700 hover:text-blue-900 font-medium">
+              Contact
+            </Link>
+            <ThemeToggle />
             <Link href="/login" className="text-blue-700 hover:text-blue-900 font-medium">
               Login
             </Link>

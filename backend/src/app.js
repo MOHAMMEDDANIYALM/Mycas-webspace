@@ -8,7 +8,8 @@ const env = require('./config/env');
 const authRoutes = require('./routes/authRoutes');
 const timetableRoutes = require('./routes/timetableRoutes');
 const emailRoutes = require('./routes/emailRoutes');
-const { errorHandler, notFound } = require('./middleware/errorMiddleware');
+const emailManagementRoutes = require('./routes/emailManagementRoutes');
+const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.get('/api/v1/health', (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/timetable', timetableRoutes);
 app.use('/api/v1/email', emailRoutes);
+app.use('/api/v1/email-management', emailManagementRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

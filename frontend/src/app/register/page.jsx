@@ -13,8 +13,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    password: '',
-    classCode: ''
+    password: ''
   });
 
   useEffect(() => {
@@ -70,13 +69,10 @@ export default function RegisterPage() {
             onChange={(event) => setFormData((prev) => ({ ...prev, password: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
           />
-          <input
-            type="text"
-            placeholder="Class code (e.g. BCA-SEM1)"
-            value={formData.classCode}
-            onChange={(event) => setFormData((prev) => ({ ...prev, classCode: event.target.value.toUpperCase() }))}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-          />
+
+          <p className="rounded-lg bg-blue-50 p-3 text-xs text-blue-700">
+            Your email must be approved by your institution before registration. Contact your school if your email is not approved.
+          </p>
 
           <button
             type="submit"

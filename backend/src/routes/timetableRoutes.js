@@ -5,8 +5,8 @@ const {
   updateEvent,
   deleteEvent
 } = require('../controllers/timetableController');
-const { protect } = require('../middleware/authMiddleware');
-const { authorizeRoles } = require('../middleware/roleMiddleware');
+const { protect } = require('../middlewares/authMiddleware');
+const { authorizeRoles } = require('../middlewares/roleMiddleware');
 
 const router = express.Router();
 

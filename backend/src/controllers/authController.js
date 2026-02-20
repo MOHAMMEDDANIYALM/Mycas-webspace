@@ -1,5 +1,6 @@
 const env = require('../config/env');
 const { User } = require('../models/User');
+const ApprovedEmail = require('../models/ApprovedEmail');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/token');
@@ -63,10 +64,10 @@ const sanitizeUser = (user) => ({
 });
 
 const register = asyncHandler(async (req, res) => {
-  const { fullName, email, password, classCode, classId } = req.body;
+  const { fullName, email, password } = req.body;
 
   if (!fullName || !email || !password) {
-    throw new AppError('fullName, email and password are required.', 400);
+    throw new AppError('fullName, email, and password are required.', 400);
   }
 
   const normalizedFullName = fullName.trim();
@@ -91,22 +92,33 @@ const register = asyncHandler(async (req, res) => {
     throw new AppError('Email is already registered.', 409);
   }
 
-  const selectedRole = 'student';
+  // Check if email is approved by a teacher for student registration
+  const approvedEmail = await ApprovedEmail.findOne({ email: normalizedEmail });
 
-  const normalizedClassId = classId
-    ? classId.trim().toUpperCase()
-    : classCode
-      ? classCode.trim().toUpperCase()
-      : '';
+  if (!approvedEmail) {
+    throw new AppError(
+      'This email has not been approved for registration. Contact your institution.',
+      403
+    );
+  }
+
+  if (approvedEmail.status === 'registered') {
+    throw new AppError('This email has already been used to register.', 409);
+  }
 
   const user = await User.create({
     fullName: normalizedFullName,
     email: normalizedEmail,
     password,
-    role: selectedRole,
-    classCode: classCode ? classCode.trim().toUpperCase() : normalizedClassId,
-    classId: normalizedClassId
+    role: 'student',
+    classCode: approvedEmail.classCode,
+    classId: approvedEmail.classCode
   });
+
+  // Update approved email status to registered
+  approvedEmail.status = 'registered';
+  approvedEmail.registeredAt = new Date();
+  await approvedEmail.save();
 
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);

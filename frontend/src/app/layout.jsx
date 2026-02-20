@@ -2,6 +2,7 @@ import 'app/globals.css';
 import { Toaster } from 'react-hot-toast';
 import QueryProvider from 'providers/QueryProvider';
 import { AuthProvider } from 'providers/AuthProvider';
+import { ThemeProvider } from 'providers/ThemeProvider';
 
 export const metadata = {
   title: 'MYCAS Institute - College Portal',
@@ -14,13 +15,15 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="bg-white">
-        <QueryProvider>
-          <AuthProvider>
-            {children}
-            <Toaster position="top-right" />
-          </AuthProvider>
-        </QueryProvider>
+      <body className="bg-white dark:bg-gray-900">
+        <ThemeProvider>
+          <QueryProvider>
+            <AuthProvider>
+              {children}
+              <Toaster position="top-right" />
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
