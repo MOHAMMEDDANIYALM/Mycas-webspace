@@ -19,7 +19,7 @@ export default function BulkEmailForm({ role }) {
 
   const sendEmailMutation = useMutation({
     mutationFn: async (payload) => {
-      return authRequest('/email/class-bulk', {
+      return authRequest('/email/send-bulk', {
         method: 'POST',
         body: payload
       });

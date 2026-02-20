@@ -1,0 +1,68 @@
+name: Frontend Container Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-container-deploy.yml"
+  workflow_dispatch:
+
+env:
+  ACR_NAME: ${{ vars.ACR_NAME }}
+  ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+  IMAGE_NAME: ${{ vars.FRONTEND_IMAGE_NAME }}
+  WEBAPP_NAME: ${{ vars.FRONTEND_WEBAPP_NAME }}
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ACR Login
+        run: az acr login --name "$ACR_NAME"
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_BASE_URL="${{ vars.NEXT_PUBLIC_API_BASE_URL }}" \
+            -f frontend/Dockerfile \
+            -t "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}" \
+            -t "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest" \
+            frontend
+
+      - name: Push Docker image
+        run: |
+          docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}"
+          docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest"
+
+      - name: Configure Azure Web App container image
+        run: |
+          az webapp config container set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --container-image-name "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest" \
+            --container-registry-url "https://$ACR_LOGIN_SERVER"
+
+      - name: Set required app settings
+        run: |
+          az webapp config appsettings set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings WEBSITES_PORT=3000 PORT=3000 NODE_ENV=production NEXT_PUBLIC_API_BASE_URL="${{ vars.NEXT_PUBLIC_API_BASE_URL }}"
+
+      - name: Restart Web App
+        run: az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"

@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 const env = require('./env');
 
 const connectDb = async () => {
-  await mongoose.connect(env.mongodbUri);
+  mongoose.set('strictQuery', true);
+
+  await mongoose.connect(env.mongodbUri, {
+    serverSelectionTimeoutMS: 10000,
+    maxPoolSize: 10
+  });
+
   console.log('MongoDB connected');
 };
 

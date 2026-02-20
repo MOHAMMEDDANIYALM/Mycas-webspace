@@ -5,9 +5,13 @@ const ROLES = ['student', 'teacher', 'promo_admin', 'super_admin'];
 
 const refreshTokenSchema = new mongoose.Schema(
   {
+    tokenHash: {
+      type: String,
+      required: false
+    },
     token: {
       type: String,
-      required: true
+      required: false
     },
     expiresAt: {
       type: Date,

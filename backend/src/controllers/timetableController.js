@@ -34,6 +34,11 @@ const validateDates = (start, end) => {
     throw new AppError('end must be after start.', 400);
   }
 
+  const maxEventDurationMs = 24 * 60 * 60 * 1000;
+  if (endDate - startDate > maxEventDurationMs) {
+    throw new AppError('Event duration cannot exceed 24 hours.', 400);
+  }
+
   return { startDate, endDate };
 };
 
@@ -59,7 +64,16 @@ const createEvent = asyncHandler(async (req, res) => {
     throw new AppError('title and classCode are required.', 400);
   }
 
+  const trimmedTitle = title.trim();
+  if (trimmedTitle.length < 1 || trimmedTitle.length > 120) {
+    throw new AppError('title must be between 1 and 120 characters.', 400);
+  }
+
   const normalizedClassCode = normalizeClassCode(classCode);
+  if (!normalizedClassCode) {
+    throw new AppError('classCode is required.', 400);
+  }
+
   const { startDate, endDate } = validateDates(start, end);
 
   const conflict = await TimetableEvent.findOne(
@@ -71,13 +85,16 @@ const createEvent = asyncHandler(async (req, res) => {
   );
 
   if (conflict) {
-    throw new AppError('Time conflict detected for this class.', 409);
+    throw new AppError(
+      `Conflict detected: "${conflict.title}" is already scheduled for ${normalizedClassCode} in this time slot.`,
+      409
+    );
   }
 
   const event = await TimetableEvent.create({
-    title,
+    title: trimmedTitle,
     classCode: normalizedClassCode,
-    room: room || '',
+    room: room?.trim() || '',
     start: startDate,
     end: endDate,
     createdBy: req.user._id,
@@ -99,11 +116,19 @@ const updateEvent = asyncHandler(async (req, res) => {
     throw new AppError('Timetable event not found.', 404);
   }
 
-  const nextTitle = req.body.title ?? existingEvent.title;
-  const nextRoom = req.body.room ?? existingEvent.room;
+  const nextTitle = req.body.title?.trim() ?? existingEvent.title;
+  const nextRoom = req.body.room?.trim() ?? existingEvent.room;
   const nextClassCode = normalizeClassCode(req.body.classCode ?? existingEvent.classCode);
   const rawStart = req.body.start ?? existingEvent.start;
   const rawEnd = req.body.end ?? existingEvent.end;
+
+  if (nextTitle.length < 1 || nextTitle.length > 120) {
+    throw new AppError('title must be between 1 and 120 characters.', 400);
+  }
+
+  if (!nextClassCode) {
+    throw new AppError('classCode is required.', 400);
+  }
 
   const { startDate, endDate } = validateDates(rawStart, rawEnd);
 
@@ -117,7 +142,10 @@ const updateEvent = asyncHandler(async (req, res) => {
   );
 
   if (conflict) {
-    throw new AppError('Time conflict detected for this class.', 409);
+    throw new AppError(
+      `Conflict detected: "${conflict.title}" is already scheduled for ${nextClassCode} in this time slot.`,
+      409
+    );
   }
 
   existingEvent.title = nextTitle;

@@ -12,9 +12,12 @@ export default function PublicLanding() {
         </p>
 
         <div className="mt-8 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6">
-          <h2 className="text-xl font-semibold">360° Virtual Tour (Phase 5)</h2>
+          <h2 className="text-xl font-semibold">360° Virtual Campus Tour</h2>
           <p className="mt-2 text-sm text-slate-600">
-            Entrance, corridor, classroom, and lab scenes will be available here.
+            Explore entrance, corridors, classrooms, and lab scenes in an immersive virtual tour.
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Integration ready: Install pannellum and add multi-scene configuration here.
           </p>
         </div>
 

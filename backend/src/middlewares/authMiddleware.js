@@ -11,7 +11,14 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const payload = verifyAccessToken(token);
+
+  let payload;
+
+  try {
+    payload = verifyAccessToken(token);
+  } catch {
+    throw new AppError('Invalid or expired access token.', 401);
+  }
 
   const user = await User.findById(payload.sub).select('-refreshTokens');
 

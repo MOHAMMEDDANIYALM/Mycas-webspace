@@ -1,0 +1,79 @@
+name: Backend Container Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-container-deploy.yml"
+  workflow_dispatch:
+
+env:
+  ACR_NAME: ${{ vars.ACR_NAME }}
+  ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+  IMAGE_NAME: ${{ vars.BACKEND_IMAGE_NAME }}
+  WEBAPP_NAME: ${{ vars.BACKEND_WEBAPP_NAME }}
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ACR Login
+        run: az acr login --name "$ACR_NAME"
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}" \
+            -t "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest" \
+            backend
+
+      - name: Push Docker image
+        run: |
+          docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}"
+          docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest"
+
+      - name: Configure Azure Web App container image
+        run: |
+          az webapp config container set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --container-image-name "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest" \
+            --container-registry-url "https://$ACR_LOGIN_SERVER"
+
+      - name: Set required app settings
+        run: |
+          az webapp config appsettings set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --settings \
+              WEBSITES_PORT=8080 \
+              PORT=8080 \
+              NODE_ENV=production \
+              MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+              ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" \
+              REFRESH_TOKEN_SECRET="${{ secrets.REFRESH_TOKEN_SECRET }}" \
+              CORS_ALLOWED_ORIGINS="${{ secrets.CORS_ALLOWED_ORIGINS }}" \
+              FRONTEND_ORIGIN="${{ secrets.FRONTEND_ORIGIN }}" \
+              COOKIE_SECURE=true \
+              COOKIE_SAME_SITE=none \
+              SENDGRID_API_KEY="${{ secrets.SENDGRID_API_KEY }}" \
+              EMAIL_FROM="${{ secrets.EMAIL_FROM }}"
+
+      - name: Restart Web App
+        run: az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"

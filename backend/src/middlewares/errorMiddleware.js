@@ -6,8 +6,29 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (error, req, res, next) => {
-  const statusCode = error.statusCode || 500;
-  const message = error.message || 'Internal server error';
+  let statusCode = error.statusCode || 500;
+  let message = error.message || 'Internal server error';
+
+  if (error.name === 'CastError') {
+    statusCode = 400;
+    message = `Invalid ${error.path}: ${error.value}`;
+  }
+
+  if (error.name === 'ValidationError') {
+    statusCode = 400;
+    message = Object.values(error.errors)
+      .map((entry) => entry.message)
+      .join(', ');
+  }
+
+  if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Invalid or expired token.';
+  }
+
+  if (error.message === 'CORS origin not allowed') {
+    statusCode = 403;
+  }
 
   if (env.nodeEnv !== 'production') {
     console.error(error);

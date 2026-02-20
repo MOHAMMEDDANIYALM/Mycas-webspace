@@ -90,7 +90,9 @@ const sendBulkEmailInBatches = async ({ recipients, subject, message, batchSize 
       }
     }
 
-    await new Promise((resolve) => setImmediate(resolve));
+    if (batches.indexOf(batch) < batches.length - 1) {
+      await wait(env.sendgridBatchDelayMs || 100);
+    }
   }
 
   return { successCount, failureCount };

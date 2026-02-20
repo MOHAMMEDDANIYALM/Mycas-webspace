@@ -89,12 +89,15 @@ export default function TimetableCalendar({ role }) {
 
   const handleSelect = (selectionInfo) => {
     if (!canEdit) {
+      toast.error('You do not have permission to edit the timetable.');
+      selectionInfo.view.calendar.unselect();
       return;
     }
 
     const title = window.prompt('Enter subject/title');
 
     if (!title || !title.trim()) {
+      selectionInfo.view.calendar.unselect();
       return;
     }
 
@@ -111,24 +114,36 @@ export default function TimetableCalendar({ role }) {
 
   const handleEventChange = (changeInfo) => {
     if (!canEdit) {
+      changeInfo.revert();
+      toast.error('You do not have permission to edit the timetable.');
       return;
     }
 
-    updateMutation.mutate({
-      id: changeInfo.event.id,
-      payload: {
-        start: changeInfo.event.start?.toISOString(),
-        end: changeInfo.event.end?.toISOString()
+    updateMutation.mutate(
+      {
+        id: changeInfo.event.id,
+        payload: {
+          start: changeInfo.event.start?.toISOString(),
+          end: changeInfo.event.end?.toISOString()
+        }
+      },
+      {
+        onError: () => {
+          changeInfo.revert();
+        }
       }
-    });
+    );
   };
 
   const handleEventClick = (clickInfo) => {
     if (!canEdit) {
+      toast.error('You do not have permission to delete timetable events.');
       return;
     }
 
-    const shouldDelete = window.confirm('Delete this timetable event?');
+    const shouldDelete = window.confirm(
+      `Delete "${clickInfo.event.extendedProps.rawTitle || clickInfo.event.title}"?`
+    );
 
     if (shouldDelete) {
       deleteMutation.mutate(clickInfo.event.id);
