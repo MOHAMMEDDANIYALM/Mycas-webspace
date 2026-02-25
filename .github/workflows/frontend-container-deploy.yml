@@ -49,20 +49,27 @@ jobs:
           docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}"
           docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest"
 
-      - name: Configure Azure Web App container image
+      - name: Validate target Azure Web App
         run: |
-          az webapp config container set \
+          az webapp show \
             --name "$WEBAPP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --container-image-name "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest" \
-            --container-registry-url "https://$ACR_LOGIN_SERVER"
+            --query "name" \
+            --output tsv
+
+      - name: Configure Azure Web App container image
+        run: |
+          az webapp config set \
+            --name "$WEBAPP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --linux-fx-version "DOCKER|$ACR_LOGIN_SERVER/$IMAGE_NAME:latest"
 
       - name: Set required app settings
         run: |
           az webapp config appsettings set \
             --name "$WEBAPP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --settings WEBSITES_PORT=3000 PORT=3000 NODE_ENV=production NEXT_PUBLIC_API_BASE_URL="${{ vars.NEXT_PUBLIC_API_BASE_URL }}"
+            --settings WEBSITES_PORT=3000 PORT=3000 NODE_ENV=production NEXT_PUBLIC_API_BASE_URL="${{ vars.NEXT_PUBLIC_API_BASE_URL }}" DOCKER_REGISTRY_SERVER_URL="https://$ACR_LOGIN_SERVER"
 
       - name: Restart Web App
         run: az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
