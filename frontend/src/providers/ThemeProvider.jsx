@@ -33,12 +33,13 @@ export function ThemeProvider({ children }) {
     applyTheme(newTheme);
   };
 
-  if (!mounted) {
-    return children;
-  }
+  const contextValue = {
+    isDark,
+    toggleTheme: mounted ? toggleTheme : () => {}
+  };
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

@@ -1,190 +1,76 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
+import PublicNavbar from 'components/public/PublicNavbar';
+import PublicFooter from 'components/public/PublicFooter';
+import AnimatedCounter from 'components/ui/AnimatedCounter';
+import SectionReveal from 'components/ui/SectionReveal';
+import GlassCard from 'components/ui/GlassCard';
+
+const timeline = [
+  { year: '2010', event: 'Foundation of MYCAS Institute' },
+  { year: '2015', event: 'Launch of UG technology and management programs' },
+  { year: '2020', event: 'Campus digital transformation and smart classrooms' },
+  { year: '2026', event: 'Immersive student portal and virtual campus experience' }
+];
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="border-b border-blue-200 bg-white sticky top-0 z-50">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-blue-900">
-            <Image
-              src="/mycas-logo.png"
-              alt="MYCAS Logo"
-              width={40}
-              height={40}
-              unoptimized
-              priority
-              className="object-contain"
-            />
-            <span>MYCAS Portal</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/departments" className="text-blue-700 hover:text-blue-900">
-              Departments
-            </Link>
-            <Link href="/faculty" className="text-blue-700 hover:text-blue-900">
-              Faculty
-            </Link>
-            <Link href="/contact" className="text-blue-700 hover:text-blue-900">
-              Contact
-            </Link>
-            <Link href="/login" className="text-blue-700 hover:text-blue-900">
-              Login
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_20%_10%,#e0ecff_0,#ffffff_40%)] dark:bg-slate-950">
+      <PublicNavbar />
 
-      {/* About Hero */}
-      <section className="bg-gradient-to-b from-blue-50 to-white py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-12 text-center">
-            <h1 className="mb-4 text-5xl font-bold text-blue-900">About MYCAS Institute</h1>
-            <p className="text-xl text-gray-700">
-              Excellence in Commerce, Administration & Science Education
+      <SectionReveal className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <GlassCard>
+            <h1 className="text-4xl font-semibold tracking-tight text-blue-900 dark:text-white">About MYCAS Institute</h1>
+            <p className="mt-4 leading-relaxed text-slate-600 dark:text-slate-300">
+              MYCAS is built around future-ready education in Commerce, Science, and Management through immersive learning and strong mentorship.
             </p>
-          </div>
-
-          <div className="grid gap-12 md:grid-cols-2">
-            <div>
-              <h2 className="mb-4 text-2xl font-bold text-blue-900">Our Mission</h2>
-              <p className="mb-4 leading-relaxed text-gray-700">
-                At MYCAS Institute, we are committed to providing world-class education in Commerce, 
-                Administration, and Science. Our mission is to nurture socially responsible, analytical, 
-                and creative professionals who can lead the future.
-              </p>
-              <p className="leading-relaxed text-gray-700">
-                We believe in holistic development that combines academic excellence with practical 
-                skills, ethical values, and social consciousness.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-4 text-2xl font-bold text-blue-900">Our Vision</h2>
-              <p className="mb-4 leading-relaxed text-gray-700">
-                To be a leading institution recognized for excellence in higher education, producing 
-                graduates who are:
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Academically outstanding and intellectually curious</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Professionally competent and ethically sound</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Socially responsible and environmentally conscious</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-blue-600 font-bold">✓</span>
-                  <span>Leaders and innovators in their fields</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          </GlassCard>
+          <GlassCard>
+            <h2 className="text-xl font-semibold text-blue-900 dark:text-white">Mission & Vision</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              Mission: empower learners with strong academics, digital skills, and ethical leadership.
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              Vision: become a benchmark institution for premium learning experiences and career outcomes.
+            </p>
+          </GlassCard>
         </div>
-      </section>
+      </SectionReveal>
 
-      {/* Core Values */}
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <h2 className="mb-12 text-center text-3xl font-bold text-blue-900">Our Core Values</h2>
-          <div className="grid gap-8 md:grid-cols-4">
-            <div className="rounded-lg bg-blue-50 p-6">
-              <div className="mb-3 text-3xl">🎓</div>
-              <h3 className="mb-2 text-lg font-bold text-blue-900">Excellence</h3>
-              <p className="text-gray-700">
-                Pursuit of the highest standards in teaching, learning, and all endeavors.
+      <SectionReveal className="mx-auto max-w-7xl px-4 pb-14 md:px-6">
+        <div className="grid gap-4 md:grid-cols-4">
+          {[
+            { label: 'Students Enrolled', value: 5000, suffix: '+' },
+            { label: 'Faculty Members', value: 150, suffix: '+' },
+            { label: 'Programs', value: 25, suffix: '+' },
+            { label: 'Placement', value: 98, suffix: '%' }
+          ].map((item) => (
+            <GlassCard key={item.label} className="text-center">
+              <p className="text-3xl font-semibold text-blue-800 dark:text-blue-300">
+                <AnimatedCounter target={item.value} suffix={item.suffix} />
               </p>
-            </div>
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">{item.label}</p>
+            </GlassCard>
+          ))}
+        </div>
+      </SectionReveal>
 
-            <div className="rounded-lg bg-green-50 p-6">
-              <div className="mb-3 text-3xl">🤝</div>
-              <h3 className="mb-2 text-lg font-bold text-green-900">Integrity</h3>
-              <p className="text-gray-700">
-                Upholding honesty, transparency, and ethical conduct in all interactions.
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-purple-50 p-6">
-              <div className="mb-3 text-3xl">🌟</div>
-              <h3 className="mb-2 text-lg font-bold text-purple-900">Innovation</h3>
-              <p className="text-gray-700">
-                Embracing creativity and forward-thinking approaches to problem-solving.
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-orange-50 p-6">
-              <div className="mb-3 text-3xl">🌍</div>
-              <h3 className="mb-2 text-lg font-bold text-orange-900">Inclusivity</h3>
-              <p className="text-gray-700">
-                Creating a welcoming community that values diversity and equal opportunity.
-              </p>
-            </div>
+      <SectionReveal className="mx-auto max-w-5xl px-4 pb-20 md:px-6">
+        <GlassCard>
+          <h2 className="mb-6 text-2xl font-semibold text-blue-900 dark:text-white">Institution Timeline</h2>
+          <div className="space-y-4">
+            {timeline.map((item) => (
+              <div key={item.year} className="flex items-start gap-4">
+                <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">{item.year}</span>
+                <p className="pt-1 text-sm text-slate-700 dark:text-slate-300">{item.event}</p>
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
+        </GlassCard>
+      </SectionReveal>
 
-      {/* Statistics */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16 text-white">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid gap-8 md:grid-cols-4 text-center">
-            <div>
-              <div className="text-4xl font-bold">5000+</div>
-              <p className="mt-2 text-blue-100">Students Enrolled</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold">150+</div>
-              <p className="mt-2 text-blue-100">Faculty Members</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold">25+</div>
-              <p className="mt-2 text-blue-100">Programs Offered</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold">98%</div>
-              <p className="mt-2 text-blue-100">Placement Rate</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-blue-900">Join Our Community</h2>
-          <p className="mb-8 text-gray-700">
-            Discover how MYCAS Institute can help you achieve your academic and professional goals.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/admission"
-              className="rounded-lg bg-blue-600 px-8 py-3 text-white font-semibold hover:bg-blue-700 transition"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-lg border-2 border-blue-600 px-8 py-3 text-blue-600 font-semibold hover:bg-blue-50 transition"
-            >
-              Contact Us
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-blue-200 bg-white py-8">
-        <div className="mx-auto max-w-7xl px-6 text-center text-gray-600">
-          <p>© 2026 MYCAS Institute. All rights reserved. Towards a Brighter Future.</p>
-        </div>
-      </footer>
+      <PublicFooter />
     </main>
   );
 }
