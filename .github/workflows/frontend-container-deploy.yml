@@ -12,7 +12,7 @@ env:
   ACR_NAME: ${{ vars.ACR_NAME }}
   ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
   IMAGE_NAME: ${{ vars.FRONTEND_IMAGE_NAME }}
-  WEBAPP_NAME: mycasinstitute
+  WEBAPP_NAME: ${{ vars.FRONTEND_WEBAPP_NAME }}
   RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
 
 jobs:
@@ -56,6 +56,9 @@ jobs:
             --resource-group "$RESOURCE_GROUP" \
             --query "name" \
             --output tsv
+
+      - name: Ensure Azure Web App is started
+        run: az webapp start --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
 
       - name: Configure Azure Web App container image
         run: |
