@@ -65,9 +65,9 @@ export default function ImmersiveDashboard({ user, onLogout }) {
   }, [activeSection, user?.role]);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_20%_0%,#dbeafe_0,#eef2ff_35%,#f8fafc_70%)] dark:bg-slate-950">
+    <main className="min-h-screen bg-[linear-gradient(160deg,#dbeafe_0%,#bfdbfe_38%,#e0e7ff_100%)] dark:bg-[linear-gradient(160deg,#0f172a_0%,#1e3a8a_45%,#111827_100%)]">
       <div className="mx-auto flex max-w-7xl gap-4 px-3 py-4 md:px-6 md:py-6">
-        <aside className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-blue-100 bg-white/80 p-4 backdrop-blur-xl transition md:static md:translate-x-0 dark:border-slate-700 dark:bg-slate-900/80 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-white/50 bg-white/60 p-4 shadow-2xl backdrop-blur-2xl transition md:static md:translate-x-0 dark:border-blue-100/10 dark:bg-slate-900/70 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-blue-900 dark:text-white">Dashboard</h2>
             <button onClick={() => setSidebarOpen(false)} className="rounded-md bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 md:hidden dark:bg-slate-800 dark:text-slate-200">
@@ -75,7 +75,7 @@ export default function ImmersiveDashboard({ user, onLogout }) {
             </button>
           </div>
 
-          <div className="mb-5 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-xs dark:border-slate-700 dark:bg-slate-800">
+          <div className="mb-5 rounded-2xl border border-blue-100/80 bg-gradient-to-r from-blue-50/80 to-indigo-50/60 p-3 text-xs dark:border-slate-700 dark:from-slate-800 dark:to-slate-900">
             <p className="font-semibold text-blue-900 dark:text-white">{user?.fullName}</p>
             <p className="mt-1 capitalize text-slate-600 dark:text-slate-300">{user?.role?.replace('_', ' ')}</p>
           </div>
@@ -108,6 +108,25 @@ export default function ImmersiveDashboard({ user, onLogout }) {
             <div className="hidden md:block" />
             <div className="rounded-full bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-900 dark:text-slate-200">
               {activeSection}
+            </div>
+          </div>
+
+          <div className="mb-4 rounded-3xl border border-white/60 bg-white/55 p-5 shadow-[0_20px_45px_rgba(37,99,235,0.2)] backdrop-blur-xl dark:border-blue-100/10 dark:bg-slate-900/65">
+            <h1 className="text-2xl font-semibold text-slate-800 dark:text-white md:text-3xl">Welcome Back, {user?.fullName?.split(' ')[0] || 'Student'}.</h1>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Your live workspace for classes, fees, attendance, and actions.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl bg-blue-600/90 px-4 py-3 text-white">
+                <p className="text-xs uppercase tracking-wide text-blue-100">Attendance</p>
+                <p className="mt-1 text-xl font-semibold">92%</p>
+              </div>
+              <div className="rounded-xl bg-white/80 px-4 py-3 text-slate-700 ring-1 ring-blue-100 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Pending</p>
+                <p className="mt-1 text-xl font-semibold">3 Tasks</p>
+              </div>
+              <div className="rounded-xl bg-white/80 px-4 py-3 text-slate-700 ring-1 ring-blue-100 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Fees</p>
+                <p className="mt-1 text-xl font-semibold">₹ 1,200</p>
+              </div>
             </div>
           </div>
 
