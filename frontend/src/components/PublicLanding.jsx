@@ -8,7 +8,6 @@ import ThemeToggle from './ThemeToggle';
 export default function PublicLanding() {
   const tourImages = ['/lab 1.jpeg', '/lab 2.jpeg'];
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isTourOpen, setIsTourOpen] = useState(false);
 
   const handleNextImage = () => {
     setActiveImageIndex((prev) => (prev + 1) % tourImages.length);
@@ -77,12 +76,12 @@ export default function PublicLanding() {
                 Embrace the future with our quality education, where lessons come to life through immersive learning.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={() => setIsTourOpen(true)}
+                <Link
+                  href="/tour"
                   className="rounded-lg bg-blue-600 px-8 py-3 text-white font-semibold hover:bg-blue-700 transition shadow-lg"
                 >
                   Take a Tour
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -215,71 +214,6 @@ export default function PublicLanding() {
         </div>
       </footer>
 
-      {isTourOpen && (
-        <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm">
-          <div className="flex h-full w-full flex-col">
-            <div className="flex items-center justify-between border-b border-white/20 px-6 py-4">
-              <div>
-                <h3 className="text-xl font-bold text-white">360° Virtual Campus Tour</h3>
-                <p className="text-sm text-gray-200">Currently showing Lab views (you can add more locations later).</p>
-              </div>
-              <button
-                onClick={() => setIsTourOpen(false)}
-                className="rounded-lg bg-white/15 px-4 py-2 text-white hover:bg-white/25 transition"
-              >
-                Close ✕
-              </button>
-            </div>
-
-            <div className="relative flex-1">
-              <Image
-                src={tourImages[activeImageIndex]}
-                alt={`Virtual Tour ${activeImageIndex + 1}`}
-                fill
-                unoptimized
-                priority
-                className="object-contain"
-              />
-
-              <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                <button
-                  onClick={handlePreviousImage}
-                  aria-label="Previous tour view"
-                  className="rounded-full bg-white/80 px-4 py-3 text-blue-900 hover:bg-white transition"
-                >
-                  ←
-                </button>
-              </div>
-
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <button
-                  onClick={handleNextImage}
-                  aria-label="Next tour view"
-                  className="rounded-full bg-white/80 px-4 py-3 text-blue-900 hover:bg-white transition"
-                >
-                  →
-                </button>
-              </div>
-
-              <div className="absolute inset-x-0 bottom-6 flex flex-col items-center gap-3">
-                <p className="rounded-full bg-black/50 px-4 py-1 text-sm text-white">
-                  View {activeImageIndex + 1} of {tourImages.length}
-                </p>
-                <div className="flex items-center gap-2">
-                  {tourImages.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveImageIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full ${index === activeImageIndex ? 'bg-white' : 'bg-white/50'}`}
-                      aria-label={`Open tour view ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
