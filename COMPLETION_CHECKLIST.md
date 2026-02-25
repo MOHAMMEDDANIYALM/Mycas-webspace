@@ -215,7 +215,7 @@ git push origin main
 # 2. Push to Azure Container Registry
 # 3. Deploy to mycasinstitue Azure Web App
 # 4. Build frontend Next.js
-# 5. Deploy to mycas-frontend Azure Web App
+# 5. Deploy to mycasinstitute Azure Web App
 ```
 
 ### Step 4: Monitor Deployment
@@ -229,7 +229,7 @@ git push origin main
 curl https://mycasinstitue-e8dchhexb4exasgy.centralindia-01.azurewebsites.net/api/v1/health
 
 # Test frontend
-Open https://mycas-frontend.azurewebsites.net
+Open https://mycasinstitute.azurewebsites.net
 
 # Test super admin login
 Email: mohammeddaniyal848@gmail.com

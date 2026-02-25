@@ -12,7 +12,7 @@ env:
   ACR_NAME: ${{ vars.ACR_NAME }}
   ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
   IMAGE_NAME: ${{ vars.FRONTEND_IMAGE_NAME }}
-  WEBAPP_NAME: ${{ vars.FRONTEND_WEBAPP_NAME }}
+  WEBAPP_NAME: mycasinstitute
   RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
 
 jobs:

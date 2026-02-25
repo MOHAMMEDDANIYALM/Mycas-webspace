@@ -272,7 +272,7 @@ OVERALL COMPLETION: 9/11 Tasks Done [████████░░░░] 82%
 
 **CI/CD Pipeline:** GitHub Actions configured and ready
 **Container Registry:** Azure Container Registry (mycas.azurecr.io)
-**Web Apps:** Azure Web Apps (mycas-frontend, mycasinstitue)
+**Web Apps:** Azure Web Apps (mycasinstitute, mycasinstitue)
 
 ---
 

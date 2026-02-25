@@ -297,7 +297,7 @@ git push origin main
 
 # 5. Verify production
 curl https://mycasinstitue-e8dchhexb4exasgy.centralindia-01.azurewebsites.net/api/v1/health
-open https://mycas-frontend.azurewebsites.net
+open https://mycasinstitute.azurewebsites.net
 ```
 
 ## 💡 Pro Tips
@@ -322,7 +322,7 @@ MongoDB:      mongodb://localhost:27017 (internal only)
 
 ### Production (Azure)
 ```
-Frontend:  https://mycas-frontend.azurewebsites.net
+Frontend:  https://mycasinstitute.azurewebsites.net
 Backend:   https://mycasinstitue-e8dchhexb4exasgy.centralindia-01.azurewebsites.net
 Health:    https://mycasinstitue-e8dchhexb4exasgy.centralindia-01.azurewebsites.net/api/v1/health
 ```

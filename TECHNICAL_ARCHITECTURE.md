@@ -688,7 +688,7 @@ GitHub Actions Workflows
         ├── Build Next.js
         ├── Build Docker image
         ├── Push to ACR
-        └── Deploy to Azure Web App (mycas-frontend)
+        └── Deploy to Azure Web App (mycasinstitute)
 
 Azure Stack
 ├── Container Registry (mycas.azurecr.io)
@@ -702,7 +702,7 @@ Azure Stack
 │   └── indexes
 │
 └── Web Apps
-    ├── mycas-frontend (HTTPS)
+    ├── mycasinstitute (HTTPS)
     └── mycasinstitue (API server)
 ```
 
