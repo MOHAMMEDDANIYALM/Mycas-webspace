@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import Image from 'next/image';
 
 export default function AboutPage() {
   return (
@@ -9,8 +9,17 @@ export default function AboutPage() {
       {/* Navigation */}
       <nav className="border-b border-blue-200 bg-white sticky top-0 z-50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-bold text-blue-900">
-            MYCAS Portal
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-blue-900">
+            <Image
+              src="/mycas-logo.png"
+              alt="MYCAS Logo"
+              width={40}
+              height={40}
+              unoptimized
+              priority
+              className="object-contain"
+            />
+            <span>MYCAS Portal</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/departments" className="text-blue-700 hover:text-blue-900">

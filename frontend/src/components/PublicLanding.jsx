@@ -2,9 +2,21 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
 import ThemeToggle from './ThemeToggle';
 
 export default function PublicLanding() {
+  const tourImages = ['/lab 1.jpeg', '/lab 2.jpeg'];
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const handleNextImage = () => {
+    setActiveImageIndex((prev) => (prev + 1) % tourImages.length);
+  };
+
+  const handlePreviousImage = () => {
+    setActiveImageIndex((prev) => (prev - 1 + tourImages.length) % tourImages.length);
+  };
+
   return (
     <main className="min-h-screen w-full bg-gradient-to-b from-blue-50 to-white">
       {/* Navigation Bar */}
@@ -16,6 +28,8 @@ export default function PublicLanding() {
               alt="MYCAS Logo" 
               width={40} 
               height={40}
+              unoptimized
+              priority
               className="object-contain"
             />
             <span className="text-lg font-bold text-blue-900">MYCAS Portal</span>
@@ -62,21 +76,58 @@ export default function PublicLanding() {
                 Embrace the future with our quality education, where lessons come to life through immersive learning.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button className="rounded-lg bg-blue-600 px-8 py-3 text-white font-semibold hover:bg-blue-700 transition shadow-lg">
+                <button
+                  onClick={handleNextImage}
+                  className="rounded-lg bg-blue-600 px-8 py-3 text-white font-semibold hover:bg-blue-700 transition shadow-lg"
+                >
                   Take a Tour
                 </button>
               </div>
             </div>
 
-            {/* Right Image Placeholder */}
+            {/* Right Campus Tour Images */}
             <div className="relative h-96 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-2xl overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <svg className="w-24 h-24 text-white mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4V5h12v10z" />
-                  </svg>
-                  <p className="text-white font-semibold">Campus Image</p>
-                </div>
+              <Image
+                src={tourImages[activeImageIndex]}
+                alt={`Campus Tour ${activeImageIndex + 1}`}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                <p className="text-white font-semibold text-sm">Campus Tour Image {activeImageIndex + 1}</p>
+              </div>
+
+              <div className="absolute inset-y-0 left-0 flex items-center px-3">
+                <button
+                  onClick={handlePreviousImage}
+                  aria-label="Previous tour image"
+                  className="rounded-full bg-white/80 px-3 py-2 text-blue-900 hover:bg-white transition"
+                >
+                  ←
+                </button>
+              </div>
+
+              <div className="absolute inset-y-0 right-0 flex items-center px-3">
+                <button
+                  onClick={handleNextImage}
+                  aria-label="Next tour image"
+                  className="rounded-full bg-white/80 px-3 py-2 text-blue-900 hover:bg-white transition"
+                >
+                  →
+                </button>
+              </div>
+
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+                {tourImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveImageIndex(index)}
+                    aria-label={`Go to tour image ${index + 1}`}
+                    className={`h-2 w-2 rounded-full ${index === activeImageIndex ? 'bg-white' : 'bg-white/50'}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
