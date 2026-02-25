@@ -4,52 +4,76 @@ import Link from 'next/link';
 
 const facultyMembers = [
   {
-    name: 'Dr. Rajesh Kumar',
-    department: 'Commerce',
-    designation: 'Head of Department',
-    qualification: 'Ph.D. in Commerce',
-    experience: '20+ years',
-    specialization: 'Accounting & Financial Management'
-  },
-  {
-    name: 'Dr. Priya Sharma',
-    department: 'Science',
-    designation: 'Professor of Physics',
-    qualification: 'Ph.D. in Physics',
+    name: 'Miss Pushpa',
+    department: 'Administration',
+    designation: 'HOD',
+    qualification: 'M.Com, M.Ed',
     experience: '18+ years',
-    specialization: 'Quantum Mechanics & Nuclear Physics'
+    specialization: 'Academic Administration & Student Development'
   },
   {
-    name: 'Mr. Arjun Singh',
-    department: 'Administration',
-    designation: 'Associate Professor',
-    qualification: 'MBA, B.Tech',
-    experience: '15+ years',
-    specialization: 'Business Strategy & Operations'
-  },
-  {
-    name: 'Dr. Meera Iyer',
-    department: 'Commerce',
-    designation: 'Professor',
-    qualification: 'Ph.D. in Economics',
+    name: 'Dr. Ramcharan',
+    department: 'Management',
+    designation: 'Managing Director',
+    qualification: 'Ph.D. in Education Management',
     experience: '22+ years',
-    specialization: 'Microeconomics & Government Policy'
+    specialization: 'Institutional Strategy & Academic Leadership'
   },
   {
-    name: 'Mr. Vikram Patel',
-    department: 'Science',
-    designation: 'Associate Professor',
-    qualification: 'M.Sc. in Chemistry',
-    experience: '12+ years',
-    specialization: 'Organic Chemistry & Lab Techniques'
+    name: 'Miss Ramya',
+    department: 'UG Programs',
+    designation: 'UG Principal',
+    qualification: 'MBA, M.Phil',
+    experience: '14+ years',
+    specialization: 'Undergraduate Program Planning & Quality Assurance'
   },
   {
-    name: 'Dr. Ananya Gupta',
-    department: 'Administration',
-    designation: 'Professor',
-    qualification: 'Ph.D. in Management',
-    experience: '25+ years',
-    specialization: 'Human Resources & Organizational Behavior'
+    name: 'Dr. Ismail',
+    department: 'Management',
+    designation: 'Managing Director',
+    qualification: 'Ph.D. in Management Studies',
+    experience: '20+ years',
+    specialization: 'Governance, Partnerships & Growth'
+  },
+  {
+    name: 'Miss Mansa',
+    department: 'BCA',
+    designation: 'BCA Faculty',
+    qualification: 'MCA',
+    experience: '8+ years',
+    specialization: 'Programming Fundamentals & Web Development'
+  },
+  {
+    name: 'Miss Prakruthi',
+    department: 'BCA',
+    designation: 'BCA Faculty',
+    qualification: 'M.Sc. Computer Science',
+    experience: '7+ years',
+    specialization: 'Data Structures & Database Management'
+  },
+  {
+    name: 'Miss Shobitha',
+    department: 'BCA',
+    designation: 'BCA Faculty',
+    qualification: 'MCA, B.Ed',
+    experience: '9+ years',
+    specialization: 'Software Engineering & Student Mentoring'
+  },
+  {
+    name: 'Dr. Pankaj Mishra',
+    department: 'Languages',
+    designation: 'Hindi Teacher',
+    qualification: 'Ph.D. in Hindi Literature',
+    experience: '16+ years',
+    specialization: 'Hindi Language, Literature & Communication'
+  },
+  {
+    name: 'Miss Archana',
+    department: 'PU Department',
+    designation: 'PU Principal',
+    qualification: 'M.Sc, M.Ed',
+    experience: '15+ years',
+    specialization: 'PU Curriculum Planning & Academic Excellence'
   }
 ];
 

@@ -4,25 +4,18 @@ import Link from 'next/link';
 
 const departments = [
   {
-    name: 'Commerce',
-    icon: '💼',
-    description: 'Comprehensive study of business, accounting, economics, and finance.',
-    programs: ['B.Com (Hons)', 'M.Com', 'CA Foundation'],
-    features: ['Industry-aligned curriculum', 'Practical accounting training', 'Internship opportunities']
+    name: 'PU Department',
+    icon: '🏫',
+    description: 'Pre-University streams designed to build a strong foundation for higher education and career readiness.',
+    programs: ['PU Commerce', 'PU Science - PCMC', 'PU Science - PCMB'],
+    features: ['Strong conceptual learning', 'Exam-focused academic mentoring', 'Bridge support for UG admissions']
   },
   {
-    name: 'Administration & Management',
+    name: 'UG Department',
     icon: '📊',
-    description: 'Professional education in administration, management, and organizational leadership.',
-    programs: ['BBA', 'MBA', 'Executive Management Program'],
-    features: ['Case study approach', 'Corporate projects', 'Leadership development']
-  },
-  {
-    name: 'Science',
-    icon: '🔬',
-    description: 'Advanced study of Physics, Chemistry, Biology, and Mathematics.',
-    programs: ['B.Sc (Non-Medical)', 'B.Sc (Medical)', 'M.Sc Physics'],
-    features: ['State-of-the-art labs', 'Research opportunities', 'Expert faculty']
+    description: 'Career-oriented undergraduate programs focused on technology, business, commerce, and finance.',
+    programs: ['BCA', 'BBA', 'B.Com', 'Financial Management'],
+    features: ['Industry exposure and projects', 'Placement and internship guidance', 'Skill-based learning modules']
   }
 ];
 
@@ -57,7 +50,7 @@ export default function DepartmentsPage() {
         <div className="mx-auto max-w-7xl px-6 text-center">
           <h1 className="mb-4 text-5xl font-bold text-blue-900">Our Departments</h1>
           <p className="text-xl text-gray-700">
-            Excellence across Commerce, Administration, and Science
+            PU and UG pathways designed for academic and career excellence
           </p>
         </div>
       </section>
@@ -65,7 +58,7 @@ export default function DepartmentsPage() {
       {/* Departments Grid */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-3">
+          <div className="grid gap-12 md:grid-cols-1 lg:grid-cols-2">
             {departments.map((dept) => (
               <div
                 key={dept.name}
