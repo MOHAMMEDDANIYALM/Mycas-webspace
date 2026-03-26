@@ -1,0 +1,22 @@
+location               = "East US"
+resource_group_name    = "rg-mycas-prod"
+app_service_plan_name  = "asp-mycas-prod"
+acr_name               = "mycasregistryprod001"
+frontend_webapp_name   = "mysore-institute-of-undergraduation"
+backend_webapp_name    = "mycas-backend"
+
+frontend_image_name    = "frontend"
+backend_image_name     = "backend"
+frontend_image_tag     = "latest"
+backend_image_tag      = "latest"
+
+# Start with backend URL after apply and update frontend if needed.
+next_public_api_base_url = "https://mycas-backend.azurewebsites.net/api/v1"
+
+mongodb_uri           = "mongodb+srv://..."
+access_token_secret   = "replace-me"
+refresh_token_secret  = "replace-me"
+cors_allowed_origins  = "https://mysore-institute-of-undergraduation.azurewebsites.net"
+frontend_origin       = "https://mysore-institute-of-undergraduation.azurewebsites.net"
+sendgrid_api_key      = "SG.xxxxx"
+email_from            = "noreply@yourdomain.com"

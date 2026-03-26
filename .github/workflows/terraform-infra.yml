@@ -1,0 +1,152 @@
+name: Terraform Infra
+
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform-infra.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform-infra.yml"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform action"
+        required: true
+        default: "plan"
+        type: choice
+        options:
+          - plan
+          - apply
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: infra/terraform
+
+    env:
+      TF_IN_AUTOMATION: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Create terraform.tfvars from secret
+        env:
+          TERRAFORM_TFVARS: ${{ secrets.TERRAFORM_TFVARS }}
+        run: |
+          if [ -n "${TERRAFORM_TFVARS}" ]; then
+            printf '%s\n' "${TERRAFORM_TFVARS}" > terraform.tfvars
+          fi
+
+      - name: Create backend.hcl from secret
+        env:
+          TERRAFORM_BACKEND_HCL: ${{ secrets.TERRAFORM_BACKEND_HCL }}
+        run: |
+          if [ -n "${TERRAFORM_BACKEND_HCL}" ]; then
+            printf '%s\n' "${TERRAFORM_BACKEND_HCL}" > backend.hcl
+          fi
+
+      - name: Terraform Init
+        run: |
+          if [ -f backend.hcl ]; then
+            terraform init -backend-config=backend.hcl
+          else
+            terraform init
+          fi
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: infra/terraform/tfplan
+
+      - name: Terraform Apply
+        if: >-
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') ||
+          (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TERRAFORM_AUTO_APPLY == 'true')
+        run: terraform apply -auto-approve tfplan
+
+      - name: Sync Terraform outputs to repo variables
+        if: >-
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') ||
+          (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TERRAFORM_AUTO_APPLY == 'true')
+        env:
+          GH_ADMIN_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GH_ADMIN_TOKEN}" ]; then
+            echo "GH_ADMIN_TOKEN is not set, skipping repository variable sync."
+            exit 0
+          fi
+
+          upsert_var() {
+            local name="$1"
+            local value="$2"
+
+            status=$(curl -s -o /tmp/var_resp.txt -w "%{http_code}" \
+              -X PATCH \
+              -H "Authorization: Bearer ${GH_ADMIN_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/actions/variables/${name}" \
+              -d "{\"name\":\"${name}\",\"value\":\"${value}\"}")
+
+            if [ "$status" = "404" ]; then
+              curl -sS \
+                -X POST \
+                -H "Authorization: Bearer ${GH_ADMIN_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/${REPO}/actions/variables" \
+                -d "{\"name\":\"${name}\",\"value\":\"${value}\"}" > /dev/null
+            elif [ "$status" != "204" ]; then
+              echo "Failed to set variable ${name}. HTTP ${status}"
+              cat /tmp/var_resp.txt
+              exit 1
+            fi
+          }
+
+          RESOURCE_GROUP=$(terraform output -raw resource_group_name)
+          ACR_NAME=$(terraform output -raw acr_name)
+          ACR_LOGIN_SERVER=$(terraform output -raw acr_login_server)
+          FRONTEND_WEBAPP_NAME=$(terraform output -raw frontend_webapp_name)
+          BACKEND_WEBAPP_NAME=$(terraform output -raw backend_webapp_name)
+          FRONTEND_IMAGE_NAME=$(terraform output -raw frontend_image_name)
+          BACKEND_IMAGE_NAME=$(terraform output -raw backend_image_name)
+          NEXT_PUBLIC_API_BASE_URL=$(terraform output -raw next_public_api_base_url)
+
+          upsert_var RESOURCE_GROUP "$RESOURCE_GROUP"
+          upsert_var ACR_NAME "$ACR_NAME"
+          upsert_var ACR_LOGIN_SERVER "$ACR_LOGIN_SERVER"
+          upsert_var FRONTEND_WEBAPP_NAME "$FRONTEND_WEBAPP_NAME"
+          upsert_var BACKEND_WEBAPP_NAME "$BACKEND_WEBAPP_NAME"
+          upsert_var FRONTEND_IMAGE_NAME "$FRONTEND_IMAGE_NAME"
+          upsert_var BACKEND_IMAGE_NAME "$BACKEND_IMAGE_NAME"
+          upsert_var NEXT_PUBLIC_API_BASE_URL "$NEXT_PUBLIC_API_BASE_URL"
