@@ -51,13 +51,6 @@ export function AuthProvider({ children }) {
     return response;
   };
 
-  const register = async (payload) => {
-    const response = await api.post('/auth/register', payload);
-    setUser(response.user);
-    setAccessToken(response.accessToken);
-    return response;
-  };
-
   const logout = async () => {
     try {
       await api.post('/auth/logout', {});
@@ -116,7 +109,6 @@ export function AuthProvider({ children }) {
       isLoading,
       isAuthenticated: Boolean(user),
       login,
-      register,
       logout,
       refreshSession,
       authGet,

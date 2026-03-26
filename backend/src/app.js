@@ -9,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const timetableRoutes = require('./routes/timetableRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const emailManagementRoutes = require('./routes/emailManagementRoutes');
+const emailDirectoryRoutes = require('./routes/emailDirectoryRoutes');
 const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 
 const app = express();
@@ -65,6 +66,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/timetable', timetableRoutes);
 app.use('/api/v1/email', emailRoutes);
 app.use('/api/v1/email-management', emailManagementRoutes);
+app.use('/api/v1/email-directory', emailDirectoryRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

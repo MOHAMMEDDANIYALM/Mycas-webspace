@@ -1,6 +1,6 @@
 const env = require('../config/env');
 const { User } = require('../models/User');
-const ApprovedEmail = require('../models/ApprovedEmail');
+const { EmailDirectoryContact } = require('../models/EmailDirectoryContact');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/token');
@@ -64,83 +64,14 @@ const sanitizeUser = (user) => ({
 });
 
 const register = asyncHandler(async (req, res) => {
-  const { fullName, email, password } = req.body;
-
-  if (!fullName || !email || !password) {
-    throw new AppError('fullName, email, and password are required.', 400);
-  }
-
-  const normalizedFullName = fullName.trim();
-
-  if (normalizedFullName.length < 2 || normalizedFullName.length > 100) {
-    throw new AppError('fullName must be between 2 and 100 characters.', 400);
-  }
-
-  const normalizedEmail = email.toLowerCase().trim();
-
-  if (!validateEmail(normalizedEmail)) {
-    throw new AppError('A valid email is required.', 400);
-  }
-
-  if (typeof password !== 'string' || password.length < 8) {
-    throw new AppError('Password must be at least 8 characters.', 400);
-  }
-
-  const existingUser = await User.findOne({ email: normalizedEmail });
-
-  if (existingUser) {
-    throw new AppError('Email is already registered.', 409);
-  }
-
-  // Check if email is approved by a teacher for student registration
-  const approvedEmail = await ApprovedEmail.findOne({ email: normalizedEmail });
-
-  if (!approvedEmail) {
-    throw new AppError(
-      'This email has not been approved for registration. Contact your institution.',
-      403
-    );
-  }
-
-  if (approvedEmail.status === 'registered') {
-    throw new AppError('This email has already been used to register.', 409);
-  }
-
-  const user = await User.create({
-    fullName: normalizedFullName,
-    email: normalizedEmail,
-    password,
-    role: 'student',
-    classCode: approvedEmail.classCode,
-    classId: approvedEmail.classCode
-  });
-
-  // Update approved email status to registered
-  approvedEmail.status = 'registered';
-  approvedEmail.registeredAt = new Date();
-  await approvedEmail.save();
-
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
-
-  user.refreshTokens = [createRefreshTokenEntry(refreshToken)];
-  await user.save();
-
-  setRefreshCookie(res, refreshToken);
-
-  res.status(201).json({
-    success: true,
-    message: 'User registered successfully.',
-    accessToken,
-    user: sanitizeUser(user)
-  });
+  throw new AppError('Signup is disabled. Use email login only.', 410);
 });
 
 const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
 
-  if (!email || !password) {
-    throw new AppError('email and password are required.', 400);
+  if (!email) {
+    throw new AppError('email is required.', 400);
   }
 
   const normalizedEmail = email.toLowerCase().trim();
@@ -149,20 +80,33 @@ const login = asyncHandler(async (req, res) => {
     throw new AppError('A valid email is required.', 400);
   }
 
-  if (typeof password !== 'string' || !password) {
-    throw new AppError('Password is required.', 400);
+  const directoryContact = await EmailDirectoryContact.findOne({ email: normalizedEmail });
+
+  if (!directoryContact) {
+    throw new AppError('Email is not in the approved directory.', 403);
   }
 
-  const user = await User.findOne({ email: normalizedEmail }).select('+password');
+  let user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
-    throw new AppError('Invalid email or password.', 401);
-  }
+    user = await User.create({
+      fullName: directoryContact.fullName,
+      email: normalizedEmail,
+      role: directoryContact.role,
+      classCode: directoryContact.classCode || '',
+      classId: directoryContact.classCode || ''
+    });
+  } else {
+    const privilegedRoles = ['promo_admin', 'super_admin'];
+    user.fullName = directoryContact.fullName;
+    user.classCode = directoryContact.classCode || '';
+    user.classId = directoryContact.classCode || '';
 
-  const isPasswordValid = await user.comparePassword(password);
+    if (!privilegedRoles.includes(user.role)) {
+      user.role = directoryContact.role;
+    }
 
-  if (!isPasswordValid) {
-    throw new AppError('Invalid email or password.', 401);
+    await user.save();
   }
 
   const accessToken = generateAccessToken(user);

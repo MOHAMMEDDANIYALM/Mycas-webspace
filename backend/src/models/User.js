@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       minlength: 6,
       select: false
     },
@@ -73,7 +73,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre('save', async function preSave(next) {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return next();
   }
 
