@@ -78,7 +78,7 @@ jobs:
 
           if [ -f backend.hcl ]; then
             echo "Using backend.hcl from secret."
-            echo "TF_VAR_location=${SELECTED_LOCATION}" >> "$GITHUB_ENV"
+            echo "DEPLOY_LOCATION=${SELECTED_LOCATION}" >> "$GITHUB_ENV"
             exit 0
           fi
 
@@ -146,7 +146,7 @@ jobs:
           access_key           = "${ACCOUNT_KEY}"
           EOF
 
-          echo "TF_VAR_location=${SELECTED_LOCATION}" >> "$GITHUB_ENV"
+          echo "DEPLOY_LOCATION=${SELECTED_LOCATION}" >> "$GITHUB_ENV"
 
       - name: Terraform Init
         run: |
@@ -157,7 +157,7 @@ jobs:
           set -euo pipefail
 
           RG_NAME=$(awk -F '"' '/^resource_group_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
-          TARGET_LOCATION=${TF_VAR_location:-}
+          TARGET_LOCATION=${DEPLOY_LOCATION:-}
 
           if [ -z "${RG_NAME}" ] || [ -z "${TARGET_LOCATION}" ]; then
             exit 0
@@ -186,7 +186,12 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -lock-timeout=5m -out=tfplan
+        run: |
+          if [ -n "${DEPLOY_LOCATION:-}" ]; then
+            terraform plan -lock-timeout=5m -var="location=${DEPLOY_LOCATION}" -out=tfplan
+          else
+            terraform plan -lock-timeout=5m -out=tfplan
+          fi
 
       - name: Upload plan artifact
         uses: actions/upload-artifact@v4
