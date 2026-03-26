@@ -21,6 +21,10 @@ on:
           - plan
           - apply
 
+concurrency:
+  group: terraform-infra-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -141,7 +145,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -lock-timeout=5m -out=tfplan
 
       - name: Upload plan artifact
         uses: actions/upload-artifact@v4
@@ -153,7 +157,7 @@ jobs:
         if: >-
           (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') ||
           (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TERRAFORM_AUTO_APPLY == 'true')
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -lock-timeout=5m -auto-approve tfplan
 
       - name: Sync Terraform outputs to repo variables
         if: >-
