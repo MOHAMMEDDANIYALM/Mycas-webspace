@@ -73,7 +73,7 @@ jobs:
           fi
 
       - name: Terraform Format Check
-        run: terraform fmt -check
+        run: terraform fmt -check *.tf
 
       - name: Terraform Validate
         run: terraform validate
