@@ -152,6 +152,30 @@ jobs:
         run: |
           terraform init -reconfigure -backend-config=backend.hcl
 
+      - name: Normalize resource group location
+        run: |
+          set -euo pipefail
+
+          RG_NAME=$(awk -F '"' '/^resource_group_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          TARGET_LOCATION=${TF_VAR_location:-}
+
+          if [ -z "${RG_NAME}" ] || [ -z "${TARGET_LOCATION}" ]; then
+            exit 0
+          fi
+
+          if az group show --name "${RG_NAME}" --only-show-errors > /dev/null 2>&1; then
+            CURRENT_LOCATION=$(az group show --name "${RG_NAME}" --query location -o tsv)
+            if [ "${CURRENT_LOCATION}" != "${TARGET_LOCATION}" ]; then
+              RESOURCE_COUNT=$(az resource list --resource-group "${RG_NAME}" --query "length(@)" -o tsv)
+              if [ "${RESOURCE_COUNT}" = "0" ]; then
+                az group delete --name "${RG_NAME}" --yes --no-wait
+                az group wait --name "${RG_NAME}" --deleted
+              else
+                echo "Resource group ${RG_NAME} is in ${CURRENT_LOCATION} with resources present; cannot auto-relocate."
+              fi
+            fi
+          fi
+
       - name: Terraform Format Check
         run: terraform fmt -check *.tf
 
