@@ -52,6 +52,7 @@ resource "azurerm_linux_web_app" "backend" {
   resource_group_name = azurerm_resource_group.main.name
   service_plan_id     = azurerm_service_plan.main.id
   https_only          = true
+  depends_on          = [azurerm_linux_web_app.frontend]
 
   site_config {
     always_on = true

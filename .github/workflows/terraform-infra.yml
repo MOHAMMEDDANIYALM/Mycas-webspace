@@ -173,7 +173,7 @@ jobs:
               else
                 SAFE_LOCATION=$(echo "${TARGET_LOCATION}" | tr -cd 'a-z0-9')
                 OVERRIDE_RG_NAME="${RG_NAME}-${SAFE_LOCATION}"
-                echo "TF_VAR_resource_group_name=${OVERRIDE_RG_NAME}" >> "$GITHUB_ENV"
+                echo "DEPLOY_RESOURCE_GROUP=${OVERRIDE_RG_NAME}" >> "$GITHUB_ENV"
                 echo "Using alternate resource group ${OVERRIDE_RG_NAME} in ${TARGET_LOCATION}."
               fi
             fi
@@ -187,8 +187,12 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          if [ -n "${DEPLOY_LOCATION:-}" ]; then
+          if [ -n "${DEPLOY_LOCATION:-}" ] && [ -n "${DEPLOY_RESOURCE_GROUP:-}" ]; then
+            terraform plan -lock-timeout=5m -var="location=${DEPLOY_LOCATION}" -var="resource_group_name=${DEPLOY_RESOURCE_GROUP}" -out=tfplan
+          elif [ -n "${DEPLOY_LOCATION:-}" ]; then
             terraform plan -lock-timeout=5m -var="location=${DEPLOY_LOCATION}" -out=tfplan
+          elif [ -n "${DEPLOY_RESOURCE_GROUP:-}" ]; then
+            terraform plan -lock-timeout=5m -var="resource_group_name=${DEPLOY_RESOURCE_GROUP}" -out=tfplan
           else
             terraform plan -lock-timeout=5m -out=tfplan
           fi
