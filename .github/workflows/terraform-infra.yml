@@ -171,7 +171,10 @@ jobs:
                 az group delete --name "${RG_NAME}" --yes --no-wait
                 az group wait --name "${RG_NAME}" --deleted
               else
-                echo "Resource group ${RG_NAME} is in ${CURRENT_LOCATION} with resources present; cannot auto-relocate."
+                SAFE_LOCATION=$(echo "${TARGET_LOCATION}" | tr -cd 'a-z0-9')
+                OVERRIDE_RG_NAME="${RG_NAME}-${SAFE_LOCATION}"
+                echo "TF_VAR_resource_group_name=${OVERRIDE_RG_NAME}" >> "$GITHUB_ENV"
+                echo "Using alternate resource group ${OVERRIDE_RG_NAME} in ${TARGET_LOCATION}."
               fi
             fi
           fi
