@@ -72,13 +72,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -f backend.hcl ]; then
-            echo "Using backend.hcl from secret."
-            exit 0
-          fi
-
           LOCATION=$(awk -F '"' '/^location\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
           LOCATION=${LOCATION:-eastus}
+          SELECTED_LOCATION="${LOCATION}"
+
+          if [ -f backend.hcl ]; then
+            echo "Using backend.hcl from secret."
+            echo "TF_VAR_location=${SELECTED_LOCATION}" >> "$GITHUB_ENV"
+            exit 0
+          fi
 
           TFSTATE_RG="rg-mycas-tfstate"
           REPO_SLUG=$(echo "${GITHUB_REPOSITORY#*/}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
@@ -90,7 +92,9 @@ jobs:
 
           az group create --name "${TFSTATE_RG}" --location "${LOCATION}" --only-show-errors > /dev/null
 
-          if ! az storage account show --name "${TFSTATE_SA}" --resource-group "${TFSTATE_RG}" --only-show-errors > /dev/null 2>&1; then
+          if az storage account show --name "${TFSTATE_SA}" --resource-group "${TFSTATE_RG}" --only-show-errors > /dev/null 2>&1; then
+            SELECTED_LOCATION=$(az storage account show --name "${TFSTATE_SA}" --resource-group "${TFSTATE_RG}" --query primaryLocation -o tsv)
+          else
             created="false"
             for candidate in "${LOCATION}" centralindia southindia eastus2 westeurope uksouth; do
               if az storage account create \
@@ -103,6 +107,7 @@ jobs:
                 --allow-blob-public-access false \
                 --only-show-errors > /dev/null; then
                 created="true"
+                SELECTED_LOCATION="${candidate}"
                 break
               fi
             done
@@ -140,6 +145,8 @@ jobs:
           key                  = "${TFSTATE_KEY}"
           access_key           = "${ACCOUNT_KEY}"
           EOF
+
+          echo "TF_VAR_location=${SELECTED_LOCATION}" >> "$GITHUB_ENV"
 
       - name: Terraform Init
         run: |
