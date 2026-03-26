@@ -64,13 +64,58 @@ jobs:
             printf '%s\n' "${TERRAFORM_BACKEND_HCL}" > backend.hcl
           fi
 
+      - name: Bootstrap backend config (if missing)
+        run: |
+          set -euo pipefail
+
+          if [ -f backend.hcl ]; then
+            echo "Using backend.hcl from secret."
+            exit 0
+          fi
+
+          LOCATION=$(awk -F '"' '/^location\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          LOCATION=${LOCATION:-eastus}
+
+          TFSTATE_RG="rg-mycas-tfstate"
+          REPO_SLUG=$(echo "${GITHUB_REPOSITORY#*/}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9')
+          REPO_SLUG=${REPO_SLUG:-mycas}
+          HASH=$(echo -n "${GITHUB_REPOSITORY}" | sha256sum | cut -c1-6)
+          TFSTATE_SA="st${REPO_SLUG:0:16}${HASH}"
+          TFSTATE_CONTAINER="tfstate"
+          TFSTATE_KEY="college-portal.terraform.tfstate"
+
+          az group create --name "${TFSTATE_RG}" --location "${LOCATION}" --only-show-errors > /dev/null
+
+          if ! az storage account show --name "${TFSTATE_SA}" --resource-group "${TFSTATE_RG}" --only-show-errors > /dev/null 2>&1; then
+            az storage account create \
+              --name "${TFSTATE_SA}" \
+              --resource-group "${TFSTATE_RG}" \
+              --location "${LOCATION}" \
+              --sku Standard_LRS \
+              --kind StorageV2 \
+              --min-tls-version TLS1_2 \
+              --allow-blob-public-access false \
+              --only-show-errors > /dev/null
+          fi
+
+          ACCOUNT_KEY=$(az storage account keys list --resource-group "${TFSTATE_RG}" --account-name "${TFSTATE_SA}" --query "[0].value" -o tsv)
+          az storage container create \
+            --name "${TFSTATE_CONTAINER}" \
+            --account-name "${TFSTATE_SA}" \
+            --account-key "${ACCOUNT_KEY}" \
+            --only-show-errors > /dev/null
+
+          cat > backend.hcl <<EOF
+          resource_group_name  = "${TFSTATE_RG}"
+          storage_account_name = "${TFSTATE_SA}"
+          container_name       = "${TFSTATE_CONTAINER}"
+          key                  = "${TFSTATE_KEY}"
+          access_key           = "${ACCOUNT_KEY}"
+          EOF
+
       - name: Terraform Init
         run: |
-          if [ -f backend.hcl ]; then
-            terraform init -reconfigure -backend-config=backend.hcl
-          else
-            terraform init -reconfigure -backend=false
-          fi
+          terraform init -reconfigure -backend-config=backend.hcl
 
       - name: Terraform Format Check
         run: terraform fmt -check *.tf
