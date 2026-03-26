@@ -113,18 +113,25 @@ jobs:
             fi
           fi
 
-          az storage account wait \
-            --name "${TFSTATE_SA}" \
-            --resource-group "${TFSTATE_RG}" \
-            --created \
-            --only-show-errors
+          ACCOUNT_KEY=""
+          ready="false"
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            ACCOUNT_KEY=$(az storage account keys list --resource-group "${TFSTATE_RG}" --account-name "${TFSTATE_SA}" --query "[0].value" -o tsv 2>/dev/null || true)
+            if [ -n "${ACCOUNT_KEY}" ] && az storage container create \
+              --name "${TFSTATE_CONTAINER}" \
+              --account-name "${TFSTATE_SA}" \
+              --account-key "${ACCOUNT_KEY}" \
+              --only-show-errors > /dev/null; then
+              ready="true"
+              break
+            fi
+            sleep 15
+          done
 
-          ACCOUNT_KEY=$(az storage account keys list --resource-group "${TFSTATE_RG}" --account-name "${TFSTATE_SA}" --query "[0].value" -o tsv)
-          az storage container create \
-            --name "${TFSTATE_CONTAINER}" \
-            --account-name "${TFSTATE_SA}" \
-            --account-key "${ACCOUNT_KEY}" \
-            --only-show-errors > /dev/null
+          if [ "${ready}" != "true" ]; then
+            echo "Storage account was not ready for backend container creation in time."
+            exit 1
+          fi
 
           cat > backend.hcl <<EOF
           resource_group_name  = "${TFSTATE_RG}"
