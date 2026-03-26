@@ -109,6 +109,12 @@ jobs:
             fi
           fi
 
+          az storage account wait \
+            --name "${TFSTATE_SA}" \
+            --resource-group "${TFSTATE_RG}" \
+            --created \
+            --only-show-errors
+
           ACCOUNT_KEY=$(az storage account keys list --resource-group "${TFSTATE_RG}" --account-name "${TFSTATE_SA}" --query "[0].value" -o tsv)
           az storage container create \
             --name "${TFSTATE_CONTAINER}" \
