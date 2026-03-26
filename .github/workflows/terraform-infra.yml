@@ -213,7 +213,7 @@ jobs:
             fi
 
             if eval "$check_cmd" > /dev/null 2>&1; then
-              terraform import "$address" "$id"
+              terraform import -lock-timeout=5m "$address" "$id"
             fi
           }
 
