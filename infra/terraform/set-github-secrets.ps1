@@ -60,6 +60,19 @@ $azureCreds = Read-Host
 if ([string]::IsNullOrWhiteSpace($azureCreds)) {
   throw "AZURE_CREDENTIALS cannot be empty."
 }
+
+try {
+  $json = $azureCreds | ConvertFrom-Json
+} catch {
+  throw "AZURE_CREDENTIALS is not valid JSON. Paste the full service principal JSON from Azure." 
+}
+
+foreach ($requiredKey in @('clientId', 'clientSecret', 'subscriptionId', 'tenantId')) {
+  if (-not ($json.PSObject.Properties.Name -contains $requiredKey) -or [string]::IsNullOrWhiteSpace($json.$requiredKey)) {
+    throw "AZURE_CREDENTIALS JSON is missing required key: $requiredKey"
+  }
+}
+
 $azureCreds | gh secret set AZURE_CREDENTIALS --repo $Repo | Out-Null
 
 Write-Host "Optional: GH_ADMIN_TOKEN (press Enter to skip)" -ForegroundColor Yellow
