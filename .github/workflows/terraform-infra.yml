@@ -87,15 +87,26 @@ jobs:
           az group create --name "${TFSTATE_RG}" --location "${LOCATION}" --only-show-errors > /dev/null
 
           if ! az storage account show --name "${TFSTATE_SA}" --resource-group "${TFSTATE_RG}" --only-show-errors > /dev/null 2>&1; then
-            az storage account create \
-              --name "${TFSTATE_SA}" \
-              --resource-group "${TFSTATE_RG}" \
-              --location "${LOCATION}" \
-              --sku Standard_LRS \
-              --kind StorageV2 \
-              --min-tls-version TLS1_2 \
-              --allow-blob-public-access false \
-              --only-show-errors > /dev/null
+            created="false"
+            for candidate in "${LOCATION}" centralindia southindia eastus2 westeurope uksouth; do
+              if az storage account create \
+                --name "${TFSTATE_SA}" \
+                --resource-group "${TFSTATE_RG}" \
+                --location "${candidate}" \
+                --sku Standard_LRS \
+                --kind StorageV2 \
+                --min-tls-version TLS1_2 \
+                --allow-blob-public-access false \
+                --only-show-errors > /dev/null; then
+                created="true"
+                break
+              fi
+            done
+
+            if [ "${created}" != "true" ]; then
+              echo "Failed to create backend storage account in all fallback regions."
+              exit 1
+            fi
           fi
 
           ACCOUNT_KEY=$(az storage account keys list --resource-group "${TFSTATE_RG}" --account-name "${TFSTATE_SA}" --query "[0].value" -o tsv)
