@@ -152,6 +152,24 @@ jobs:
         run: |
           terraform init -reconfigure -backend-config=backend.hcl
 
+      - name: Clear stale Terraform backend lease
+        run: |
+          set -euo pipefail
+
+          SA_NAME=$(awk -F '"' '/^storage_account_name\s*=\s*"/{print $2; exit}' backend.hcl 2>/dev/null || true)
+          CONTAINER_NAME=$(awk -F '"' '/^container_name\s*=\s*"/{print $2; exit}' backend.hcl 2>/dev/null || true)
+          STATE_KEY=$(awk -F '"' '/^key\s*=\s*"/{print $2; exit}' backend.hcl 2>/dev/null || true)
+          ACCESS_KEY=$(awk -F '"' '/^access_key\s*=\s*"/{print $2; exit}' backend.hcl 2>/dev/null || true)
+
+          if [ -n "${SA_NAME}" ] && [ -n "${CONTAINER_NAME}" ] && [ -n "${STATE_KEY}" ] && [ -n "${ACCESS_KEY}" ]; then
+            az storage blob lease break \
+              --account-name "${SA_NAME}" \
+              --account-key "${ACCESS_KEY}" \
+              --container-name "${CONTAINER_NAME}" \
+              --blob-name "${STATE_KEY}" \
+              --only-show-errors > /dev/null || true
+          fi
+
       - name: Normalize resource group location
         run: |
           set -euo pipefail
