@@ -185,6 +185,63 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Adopt existing Azure resources into Terraform state
+        run: |
+          set -euo pipefail
+
+          RG_NAME=$(awk -F '"' '/^resource_group_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          PLAN_NAME=$(awk -F '"' '/^app_service_plan_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          ACR_NAME=$(awk -F '"' '/^acr_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          FRONTEND_APP=$(awk -F '"' '/^frontend_webapp_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          BACKEND_APP=$(awk -F '"' '/^backend_webapp_name\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+          LOCATION=$(awk -F '"' '/^location\s*=\s*"/{print $2; exit}' terraform.tfvars 2>/dev/null || true)
+
+          EFFECTIVE_RG=${DEPLOY_RESOURCE_GROUP:-$RG_NAME}
+          EFFECTIVE_LOCATION=${DEPLOY_LOCATION:-$LOCATION}
+          SUB_ID=$(az account show --query id -o tsv)
+
+          export TF_VAR_resource_group_name="${EFFECTIVE_RG}"
+          export TF_VAR_location="${EFFECTIVE_LOCATION}"
+
+          import_if_missing() {
+            local address="$1"
+            local id="$2"
+            local check_cmd="$3"
+
+            if terraform state show "$address" > /dev/null 2>&1; then
+              return 0
+            fi
+
+            if eval "$check_cmd" > /dev/null 2>&1; then
+              terraform import "$address" "$id"
+            fi
+          }
+
+          import_if_missing \
+            "azurerm_resource_group.main" \
+            "/subscriptions/${SUB_ID}/resourceGroups/${EFFECTIVE_RG}" \
+            "az group show --name '${EFFECTIVE_RG}' --only-show-errors"
+
+          import_if_missing \
+            "azurerm_service_plan.main" \
+            "/subscriptions/${SUB_ID}/resourceGroups/${EFFECTIVE_RG}/providers/Microsoft.Web/serverFarms/${PLAN_NAME}" \
+            "az appservice plan show --resource-group '${EFFECTIVE_RG}' --name '${PLAN_NAME}' --only-show-errors"
+
+          import_if_missing \
+            "azurerm_container_registry.main" \
+            "/subscriptions/${SUB_ID}/resourceGroups/${EFFECTIVE_RG}/providers/Microsoft.ContainerRegistry/registries/${ACR_NAME}" \
+            "az acr show --resource-group '${EFFECTIVE_RG}' --name '${ACR_NAME}' --only-show-errors"
+
+          import_if_missing \
+            "azurerm_linux_web_app.frontend" \
+            "/subscriptions/${SUB_ID}/resourceGroups/${EFFECTIVE_RG}/providers/Microsoft.Web/sites/${FRONTEND_APP}" \
+            "az webapp show --resource-group '${EFFECTIVE_RG}' --name '${FRONTEND_APP}' --only-show-errors"
+
+          import_if_missing \
+            "azurerm_linux_web_app.backend" \
+            "/subscriptions/${SUB_ID}/resourceGroups/${EFFECTIVE_RG}/providers/Microsoft.Web/sites/${BACKEND_APP}" \
+            "az webapp show --resource-group '${EFFECTIVE_RG}' --name '${BACKEND_APP}' --only-show-errors"
+
       - name: Terraform Plan
         run: |
           if [ -n "${DEPLOY_LOCATION:-}" ] && [ -n "${DEPLOY_RESOURCE_GROUP:-}" ]; then
