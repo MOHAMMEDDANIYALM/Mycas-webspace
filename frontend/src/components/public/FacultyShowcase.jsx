@@ -101,16 +101,16 @@ export default function FacultyShowcase() {
   return (
     <>
       <SectionReveal className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
-          <div>
-            <h1 className="text-4xl font-semibold tracking-tight text-blue-900 dark:text-white md:text-5xl">Faculty & Leadership</h1>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Meet the academic leaders and faculty driving student success.</p>
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 rounded-2xl border-2 border-blue-200/50 bg-gradient-to-r from-blue-50/50 to-indigo-50/30 p-6 md:flex-row md:items-end dark:border-blue-800/30 dark:from-blue-900/20 dark:to-indigo-900/20">
+          <div className="border-l-4 border-blue-600 pl-4">
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white md:text-5xl\">👨‍🏫 Faculty & Leadership</h1>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300\">Meet the academic leaders and faculty driving student success.</p>
           </div>
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search faculty"
-            className="w-full rounded-xl border border-blue-200 bg-white/80 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none md:w-72 dark:border-slate-700 dark:bg-slate-900"
+            placeholder=\"🔍 Search faculty...\"
+            className=\"w-full rounded-xl border-2 border-blue-300 bg-white/90 px-4 py-3 text-sm placeholder-slate-400 transition focus:border-blue-500 focus:outline-none md:w-72 dark:border-blue-600/50 dark:bg-slate-800\"
           />
         </div>
 
@@ -148,27 +148,27 @@ export default function FacultyShowcase() {
 
       <AnimatePresence>
         {activeProfile && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4">
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} className="w-full max-w-2xl rounded-3xl border border-blue-100 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-2xl font-semibold text-blue-900 dark:text-white">{activeProfile.name}</h3>
-                  <p className="mt-1 text-sm font-medium text-blue-600 dark:text-blue-300">{activeProfile.designation}</p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className=\"fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4 backdrop-blur\">
+            <motion.div initial={{ y: 20, opacity: 0, scale: 0.95 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 20, opacity: 0, scale: 0.95 }} className=\"w-full max-w-2xl rounded-2xl border-2 border-blue-300 bg-gradient-to-br from-white to-blue-50 p-8 shadow-2xl dark:border-blue-700/50 dark:from-slate-800 dark:to-blue-900/30\">
+              <div className=\"flex items-start justify-between gap-4\">
+                <div className=\"border-l-4 border-blue-600 pl-4\">
+                  <h3 className=\"text-3xl font-bold text-slate-900 dark:text-white\">{activeProfile.name}</h3>
+                  <p className=\"mt-2 text-lg font-bold text-blue-600 dark:text-blue-300\">{activeProfile.designation}</p>
                 </div>
-                <button onClick={() => setActiveProfile(null)} className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-700 hover:bg-blue-100 dark:bg-slate-800 dark:text-slate-200">
-                  Close
+                <button onClick={() => setActiveProfile(null)} className=\"rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-blue-700\">
+                  ✕ Close
                 </button>
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <DetailItem label="Department" value={activeProfile.department} />
-                <DetailItem label="Experience" value={activeProfile.experience} />
-                <DetailItem label="Qualification" value={activeProfile.qualification} />
-                <DetailItem label="Subjects" value={activeProfile.subjects} />
+              <div className=\"mt-6 grid gap-3 sm:grid-cols-2\">
+                <DetailItem label=\"Department\" value={activeProfile.department} />
+                <DetailItem label=\"Experience\" value={activeProfile.experience} />
+                <DetailItem label=\"Qualification\" value={activeProfile.qualification} />
+                <DetailItem label=\"Subjects\" value={activeProfile.subjects} />
               </div>
 
-              <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3 text-sm text-blue-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                Contact: {activeProfile.contact}
+              <div className=\"mt-6 rounded-xl border-2 border-blue-300/50 bg-blue-100/40 px-4 py-3 text-sm font-semibold text-blue-900 dark:border-blue-700/30 dark:bg-blue-900/40 dark:text-blue-100\">
+                📧 Contact: {activeProfile.contact}
               </div>
             </motion.div>
           </motion.div>
@@ -180,9 +180,9 @@ export default function FacultyShowcase() {
 
 function DetailItem({ label, value }) {
   return (
-    <div className="rounded-xl border border-blue-100 bg-white/90 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="mt-1 font-medium text-slate-800 dark:text-slate-100">{value}</p>
+    <div className=\"rounded-lg border-2 border-blue-300 bg-white/80 px-4 py-3 transition dark:border-blue-700/50 dark:bg-slate-900/50\">
+      <p className=\"text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400\">{label}</p>
+      <p className=\"mt-2 text-sm font-semibold text-slate-800 dark:text-slate-100\">{value}</p>
     </div>
   );
 }

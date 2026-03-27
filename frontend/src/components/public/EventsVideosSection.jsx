@@ -22,21 +22,21 @@ export default function EventsVideosSection() {
   }, [selectedCategory]);
 
   return (
-    <section className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-3xl font-semibold text-blue-900 dark:text-white">Latest Events in MICA</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300">Swipe horizontally to preview campus events.</p>
+    <section className="space-y-6 rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-white to-blue-50/30 p-8 backdrop-blur-xl dark:border-blue-800/50 dark:from-slate-800 dark:to-blue-900/30">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div className="border-l-4 border-blue-600 pl-4">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white\">🎬 Latest Events in MICA</h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300\">Swipe horizontally to preview campus events.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+              className={`rounded-full px-4 py-2 text-sm font-bold transition ${
                 selectedCategory === category
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-slate-800 dark:text-slate-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30'
+                  : 'border-2 border-blue-300 bg-white text-blue-700 hover:bg-blue-50 dark:border-blue-700/50 dark:bg-slate-800 dark:text-blue-300'
               }`}
             >
               {category}
@@ -49,30 +49,30 @@ export default function EventsVideosSection() {
         {filteredVideos.map((video) => (
           <motion.button
             key={video.id}
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.05, translateY: -4 }}
             onClick={() => setActiveVideo(video)}
-            className="min-w-[280px] overflow-hidden rounded-2xl border border-blue-100 bg-white text-left shadow-md dark:border-slate-700 dark:bg-slate-900"
+            className="min-w-[280px] overflow-hidden rounded-xl border-2 border-blue-200 bg-white shadow-lg transition dark:border-blue-800/50 dark:bg-slate-800\"
           >
-            <video src={video.src} muted loop autoPlay playsInline className="h-44 w-full object-cover" />
-            <div className="p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">{video.category}</p>
-              <h3 className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{video.title}</h3>
+            <video src={video.src} muted loop autoPlay playsInline className="h-44 w-full object-cover\" />
+            <div className="bg-gradient-to-br from-blue-50 to-white p-4 dark:from-blue-900/20 dark:to-slate-800\\">
+              <p className=\"text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-300\">{video.category}</p>
+              <h3 className=\"mt-2 text-sm font-bold text-slate-900 dark:text-white\">{video.title}</h3>
             </div>
           </motion.button>
         ))}
       </div>
 
       {activeVideo && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-4xl overflow-hidden rounded-2xl bg-black">
-            <div className="flex items-center justify-between bg-slate-900 px-4 py-3">
-              <h4 className="text-sm font-semibold text-white">{activeVideo.title}</h4>
-              <button onClick={() => setActiveVideo(null)} className="text-xs font-semibold text-slate-200 hover:text-white">
-                CLOSE
+        <div className=\"fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur\">
+          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className=\"w-full max-w-4xl overflow-hidden rounded-2xl border-2 border-blue-400 bg-black shadow-2xl\">
+            <div className=\"flex items-center justify-between border-b-2 border-blue-400/30 bg-gradient-to-r from-slate-900 to-blue-900 px-4 py-3\">
+              <h4 className=\"text-sm font-bold text-white\">{activeVideo.title}</h4>
+              <button onClick={() => setActiveVideo(null)} className=\"rounded px-3 py-1 text-xs font-bold text-blue-300 hover:bg-blue-600/20\">
+                ✕ Close
               </button>
             </div>
-            <video src={activeVideo.src} controls autoPlay className="max-h-[70vh] w-full" />
-          </div>
+            <video src={activeVideo.src} controls autoPlay className=\"max-h-[70vh] w-full\" />
+          </motion.div>
         </div>
       )}
     </section>

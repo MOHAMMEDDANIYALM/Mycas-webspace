@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import Image from 'next/image';
 import { useAuth } from 'providers/AuthProvider';
 
 export default function LoginPage() {
@@ -35,39 +34,86 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#e0ecff_0%,#dbeafe_40%,#bfdbfe_100%)] px-4 py-10 dark:bg-[linear-gradient(135deg,#0f172a_0%,#1e3a8a_45%,#1d4ed8_100%)]">
-      <div className="pointer-events-none absolute inset-0 opacity-30">
-        <Image src="/lab 2.jpeg" alt="Campus" fill unoptimized className="object-cover" />
-      </div>
-      <div className="pointer-events-none absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-white/70 blur-3xl dark:bg-blue-200/20" />
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+      <div className="mx-auto flex min-h-screen max-w-7xl items-center px-4 md:px-6">
+        {/* Left Side - Info */}
+        <div className="hidden flex-1 lg:block">
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-5xl font-bold text-slate-900">
+                Welcome Back
+              </h1>
+              <p className="mt-4 text-xl text-slate-600">
+                Access your personalized learning dashboard
+              </p>
+            </div>
 
-      <div className="relative w-full max-w-md rounded-[2rem] border border-white/60 bg-white/55 p-7 shadow-[0_25px_60px_rgba(37,99,235,0.25)] backdrop-blur-2xl dark:border-blue-100/20 dark:bg-slate-900/55">
-        <h1 className="text-center text-4xl font-semibold tracking-tight text-slate-800 dark:text-white">Welcome Back</h1>
-        <p className="mt-3 text-center text-sm text-slate-600 dark:text-slate-300">
-          Enter your institutional email. Access is granted only if your email exists in the approved student/teacher directory.
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <div>
-            <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">Email</label>
-            <input
-              type="email"
-              placeholder="Email"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-xl border border-blue-100 bg-white/70 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200"
-            />
+            <div className="space-y-6">
+              {[
+                { icon: '🎯', title: 'Smart Learning', desc: 'Personalized course recommendations' },
+                { icon: '📊', title: 'Track Progress', desc: 'Monitor your academic journey' },
+                { icon: '🤝', title: 'Collaborate', desc: 'Connect with peers and instructors' }
+              ].map((item, idx) => (
+                <div key={idx} className="flex gap-4">
+                  <div className="text-3xl">{item.icon}</div>
+                  <div>
+                    <h3 className="font-semibold text-slate-900">{item.title}</h3>
+                    <p className="text-sm text-slate-600">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loginMutation.isPending}
-            className="mt-2 w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-blue-600 disabled:opacity-60"
-          >
-            {loginMutation.isPending ? 'Checking email...' : 'Continue'}
-          </button>
-        </form>
+        {/* Right Side - Login Form */}
+        <div className="w-full flex-1 lg:pl-12">
+          <div className="mx-auto max-w-md space-y-8">
+            <div className="rounded-2xl bg-white p-8 shadow-xl">
+              <h2 className="text-2xl font-bold text-slate-900">Sign In</h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Enter your institutional email to access the platform
+              </p>
+
+              <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="your@institution.edu"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-2 w-full rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-3 text-slate-900 placeholder-slate-400 transition focus:border-blue-500 focus:bg-white focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loginMutation.isPending}
+                  className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition hover:shadow-xl hover:shadow-blue-600/40 disabled:opacity-60"
+                >
+                  {loginMutation.isPending ? 'Checking email...' : 'Continue'}
+                </button>
+              </form>
+
+              <div className="mt-6 border-t pt-6">
+                <p className="text-center text-xs text-slate-600">
+                  Secure • Email-verified access only
+                </p>
+              </div>
+            </div>
+
+            {/* Info Box */}
+            <div className="rounded-xl bg-blue-50 p-4">
+              <p className="text-sm text-slate-700">
+                <span className="font-semibold">💡 Tip:</span> Use your institutional email registered in our student/teacher directory.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );

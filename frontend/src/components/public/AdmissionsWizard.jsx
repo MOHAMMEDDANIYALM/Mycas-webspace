@@ -52,19 +52,19 @@ export default function AdmissionsWizard() {
 
   return (
     <SectionReveal className="mx-auto max-w-4xl px-4 py-16 md:px-6">
-      <GlassCard>
-        <div className="mb-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-blue-900 dark:text-white md:text-4xl">Admissions</h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Complete your application in a simple multi-step flow.</p>
+      <GlassCard className="border-2 border-blue-200 bg-gradient-to-br from-white to-blue-50/40 dark:border-blue-800/50 dark:from-slate-800 dark:to-blue-900/30">
+        <div className="mb-8 border-l-4 border-blue-600 pl-4">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white\">📝 Admissions Portal</h1>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300\">Complete your application in a simple multi-step flow.</p>
         </div>
 
-        <div className="mb-6">
-          <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <div className=\"mb-8\">
+          <div className=\"mb-4 flex items-center justify-between text-sm font-bold uppercase tracking-widest text-blue-600 dark:text-blue-300\">
             <span>Step {step + 1} of {steps.length}</span>
-            <span>{steps[step]}</span>
+            <span className=\"rounded-full bg-blue-100 px-3 py-1 text-xs dark:bg-blue-900/40\">{steps[step]}</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-blue-100 dark:bg-slate-800">
-            <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.35 }} className="h-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <div className=\"h-3 w-full overflow-hidden rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 ring-1 ring-blue-200 dark:from-blue-900/30 dark:to-indigo-900/30 dark:ring-blue-800/50\">
+            <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.35 }} className=\"h-full bg-gradient-to-r from-blue-600 to-blue-500\" />
           </div>
         </div>
 
