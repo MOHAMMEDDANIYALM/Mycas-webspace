@@ -37,6 +37,8 @@ export default function EventsPage() {
   };
 
   useEffect(() => {
+    document.documentElement.classList.add('dark');
+
     const handleKeydown = (event) => {
       if (event.key === 'ArrowRight') {
         showNext();
@@ -61,7 +63,10 @@ export default function EventsPage() {
     };
 
     window.addEventListener('keydown', handleKeydown);
-    return () => window.removeEventListener('keydown', handleKeydown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
   }, []);
 
   useEffect(() => {
@@ -279,7 +284,7 @@ export default function EventsPage() {
       </section>
 
       <div className="relative z-20">
-        <PublicFooter />
+        <PublicFooter className="border-white/10 bg-black/80" />
       </div>
     </main>
   );
