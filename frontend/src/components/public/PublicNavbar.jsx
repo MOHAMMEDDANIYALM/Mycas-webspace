@@ -18,9 +18,8 @@ export default function PublicNavbar() {
   return (
     <nav className="sticky top-0 z-50 border-b-2 border-blue-200/60 bg-gradient-to-r from-white via-blue-50/40 to-white/80 shadow-sm backdrop-blur-xl dark:border-blue-800/40 dark:from-slate-900 dark:via-blue-950/40 dark:to-slate-900/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-        <Link href="/" className="group flex items-center gap-3 transition">
-          <Image src="/mycas-logo.png" alt="MYCAS Logo" width={36} height={36} unoptimized priority className="rounded-lg shadow-md transition group-hover:shadow-lg" />
-          <span className="bg-gradient-to-r from-blue-700 to-blue-600 bg-clip-text text-lg font-bold tracking-tight text-transparent dark:from-blue-300 dark:to-cyan-300">MYCAS Portal</span>
+        <Link href="/" className="group flex items-center gap-2 transition">
+          <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-600 bg-clip-text text-transparent dark:from-blue-300 dark:to-cyan-300">MYCAS</span>
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
