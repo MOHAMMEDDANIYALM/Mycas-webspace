@@ -163,10 +163,25 @@ export default function EventsPage() {
   const activeVideo = eventVideos[activeVideoIndex];
 
   return (
-    <main className="min-h-screen bg-black">
-      <PublicNavbar />
+    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <video
+          className="h-full w-full object-cover"
+          src="/background.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-black/62" />
+      </div>
 
-      <section className="relative bg-black">
+      <div className="relative z-20">
+        <PublicNavbar />
+      </div>
+
+      <section className="relative z-10 bg-transparent">
         <motion.div
           key={activeVideo.src}
           initial={{ opacity: 0.2, scale: 1.02 }}
@@ -263,7 +278,9 @@ export default function EventsPage() {
         </motion.div>
       </section>
 
-      <PublicFooter />
+      <div className="relative z-20">
+        <PublicFooter />
+      </div>
     </main>
   );
 }
