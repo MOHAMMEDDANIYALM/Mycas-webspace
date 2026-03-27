@@ -48,6 +48,14 @@ jobs:
           docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}"
           docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest"
 
+      - name: Fetch ACR admin credentials
+        id: acr_creds
+        run: |
+          ACR_USER=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
+          ACR_PASS=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
+          echo "acr_user=$ACR_USER" >> "$GITHUB_OUTPUT"
+          echo "acr_pass=$ACR_PASS" >> "$GITHUB_OUTPUT"
+
       - name: Configure Azure Web App container image
         run: |
           az webapp config container set \
@@ -73,7 +81,10 @@ jobs:
               COOKIE_SECURE=true \
               COOKIE_SAME_SITE=none \
               SENDGRID_API_KEY="${{ secrets.SENDGRID_API_KEY }}" \
-              EMAIL_FROM="${{ secrets.EMAIL_FROM }}"
+              EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+              DOCKER_REGISTRY_SERVER_URL="https://$ACR_LOGIN_SERVER" \
+              DOCKER_REGISTRY_SERVER_USERNAME="${{ steps.acr_creds.outputs.acr_user }}" \
+              DOCKER_REGISTRY_SERVER_PASSWORD="${{ steps.acr_creds.outputs.acr_pass }}"
 
       - name: Restart Web App
         run: az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"

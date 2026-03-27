@@ -49,6 +49,14 @@ jobs:
           docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}"
           docker push "$ACR_LOGIN_SERVER/$IMAGE_NAME:latest"
 
+      - name: Fetch ACR admin credentials
+        id: acr_creds
+        run: |
+          ACR_USER=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
+          ACR_PASS=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
+          echo "acr_user=$ACR_USER" >> "$GITHUB_OUTPUT"
+          echo "acr_pass=$ACR_PASS" >> "$GITHUB_OUTPUT"
+
       - name: Validate target Azure Web App
         run: |
           az webapp show \
@@ -72,7 +80,7 @@ jobs:
           az webapp config appsettings set \
             --name "$WEBAPP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --settings WEBSITES_PORT=3000 PORT=3000 NODE_ENV=production NEXT_PUBLIC_API_BASE_URL="${{ vars.NEXT_PUBLIC_API_BASE_URL }}" DOCKER_REGISTRY_SERVER_URL="https://$ACR_LOGIN_SERVER"
+            --settings WEBSITES_PORT=3000 PORT=3000 NODE_ENV=production NEXT_PUBLIC_API_BASE_URL="${{ vars.NEXT_PUBLIC_API_BASE_URL }}" DOCKER_REGISTRY_SERVER_URL="https://$ACR_LOGIN_SERVER" DOCKER_REGISTRY_SERVER_USERNAME="${{ steps.acr_creds.outputs.acr_user }}" DOCKER_REGISTRY_SERVER_PASSWORD="${{ steps.acr_creds.outputs.acr_pass }}"
 
       - name: Restart Web App
         run: az webapp restart --name "$WEBAPP_NAME" --resource-group "$RESOURCE_GROUP"
