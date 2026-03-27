@@ -4,10 +4,20 @@ const connectDb = require('./config/db');
 
 const startServer = async () => {
   try {
-    await connectDb();
+    let dbConnected = false;
+
+    try {
+      await connectDb();
+      dbConnected = true;
+    } catch (dbError) {
+      console.error('Database connection failed. Continuing in degraded mode:', dbError.message);
+    }
 
     const server = app.listen(env.port, () => {
       console.log(`Server running on port ${env.port}`);
+      if (!dbConnected) {
+        console.warn('Server is running without database connectivity. Excel-only auth fallback is active.');
+      }
     });
 
     const shutdown = (signal) => {

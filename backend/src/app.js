@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const env = require('./config/env');
 const authRoutes = require('./routes/authRoutes');
 const timetableRoutes = require('./routes/timetableRoutes');
@@ -90,10 +91,13 @@ app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
 app.get('/api/v1/health', (req, res) => {
+  const dbConnected = mongoose.connection.readyState === 1;
+
   res.status(200).json({
     success: true,
-    status: 'ok',
+    status: dbConnected ? 'ok' : 'degraded',
     service: 'CollegeHub API',
+    dbConnected,
     environment: env.nodeEnv,
     timestamp: new Date().toISOString()
   });

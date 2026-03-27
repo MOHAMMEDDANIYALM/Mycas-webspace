@@ -2,6 +2,7 @@ const { User } = require('../models/User');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { verifyAccessToken } = require('../utils/token');
+const mongoose = require('mongoose');
 
 const protect = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -20,7 +21,30 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new AppError('Invalid or expired access token.', 401);
   }
 
-  const user = await User.findById(payload.sub).select('-refreshTokens');
+  const dbConnected = mongoose.connection.readyState === 1;
+  let user = null;
+
+  if (dbConnected) {
+    try {
+      user = await User.findById(payload.sub).select('-refreshTokens');
+    } catch {
+      user = null;
+    }
+  }
+
+  if (!user && payload.excelProfile) {
+    user = {
+      _id: payload.sub,
+      id: payload.sub,
+      fullName: payload.fullName,
+      email: payload.email,
+      role: payload.role,
+      classCode: payload.classCode || '',
+      classId: payload.classId || '',
+      course: payload.course || payload.classCode || '',
+      excelProfile: true
+    };
+  }
 
   if (!user) {
     throw new AppError('User no longer exists.', 401);

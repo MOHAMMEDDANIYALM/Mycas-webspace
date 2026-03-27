@@ -2,11 +2,21 @@ const jwt = require('jsonwebtoken');
 const env = require('../config/env');
 
 const generateAccessToken = (user) => {
+  const sub =
+    user?._id?.toString?.() ||
+    user?.id ||
+    user?.email;
+
   return jwt.sign(
     {
-      sub: user._id.toString(),
+      sub,
       role: user.role,
-      email: user.email
+      email: user.email,
+      fullName: user.fullName || '',
+      classCode: user.classCode || '',
+      classId: user.classId || '',
+      course: user.course || '',
+      excelProfile: Boolean(user.excelProfile)
     },
     env.accessTokenSecret,
     { expiresIn: env.accessTokenExpiresIn }

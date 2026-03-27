@@ -6,6 +6,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/token');
 const { hashToken } = require('../utils/crypto');
 const { findExcelContactByEmail } = require('../utils/excelDirectory');
+const mongoose = require('mongoose');
 
 const cookieOptions = {
   httpOnly: true,
@@ -56,7 +57,7 @@ const clearRefreshCookie = (res) => {
 };
 
 const sanitizeUser = (user) => ({
-  id: user._id.toString(),
+  id: user._id?.toString?.() || user.id || user.email,
   fullName: user.fullName,
   email: user.email,
   role: user.role,
@@ -64,6 +65,25 @@ const sanitizeUser = (user) => ({
   classId: user.classId || '',
   course: user.course || ''
 });
+
+const isDbConnected = () => mongoose.connection.readyState === 1;
+
+const buildExcelFallbackUser = (email, contact) => {
+  const classCode = contact.classCode || '';
+  const classId = contact.classCode || '';
+
+  return {
+    _id: `excel:${email}`,
+    id: `excel:${email}`,
+    fullName: contact.fullName,
+    email,
+    role: contact.role,
+    classCode,
+    classId,
+    course: contact.course || classCode,
+    excelProfile: true
+  };
+};
 
 const register = asyncHandler(async (req, res) => {
   throw new AppError('Signup is disabled. Use email login only.', 410);
@@ -83,10 +103,26 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const excelContact = findExcelContactByEmail(normalizedEmail);
-  const directoryContact = excelContact || (await EmailDirectoryContact.findOne({ email: normalizedEmail }));
+  let directoryContact = excelContact;
+
+  if (!directoryContact && isDbConnected()) {
+    directoryContact = await EmailDirectoryContact.findOne({ email: normalizedEmail });
+  }
 
   if (!directoryContact) {
     throw new AppError('Email is not in the approved directory.', 403);
+  }
+
+  if (!isDbConnected()) {
+    const fallbackUser = buildExcelFallbackUser(normalizedEmail, directoryContact);
+    const accessToken = generateAccessToken(fallbackUser);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful (Excel fallback mode).',
+      accessToken,
+      user: sanitizeUser(fallbackUser)
+    });
   }
 
   let user = await User.findOne({ email: normalizedEmail });
@@ -139,6 +175,10 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const refresh = asyncHandler(async (req, res) => {
+  if (!isDbConnected()) {
+    throw new AppError('Session refresh is unavailable while database is offline. Please login again.', 503);
+  }
+
   const refreshToken = req.cookies[env.cookieName];
 
   if (!refreshToken) {
@@ -199,6 +239,14 @@ const refresh = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
+  if (!isDbConnected()) {
+    clearRefreshCookie(res);
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out.'
+    });
+  }
+
   const refreshToken = req.cookies[env.cookieName];
 
   if (refreshToken) {
@@ -231,6 +279,17 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const me = asyncHandler(async (req, res) => {
+  if (req.user?.excelProfile) {
+    return res.status(200).json({
+      success: true,
+      user: sanitizeUser(req.user)
+    });
+  }
+
+  if (!isDbConnected()) {
+    throw new AppError('Profile lookup unavailable while database is offline.', 503);
+  }
+
   const user = await User.findById(req.user.id).select('-refreshTokens');
 
   if (!user) {
