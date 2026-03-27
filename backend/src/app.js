@@ -16,16 +16,53 @@ const app = express();
 
 app.set('trust proxy', 1);
 
+const safeHostname = (origin) => {
+  try {
+    return new URL(origin).hostname.toLowerCase();
+  } catch {
+    return '';
+  }
+};
+
+const wildcardHostMatches = (hostname, pattern) => {
+  if (!pattern.startsWith('*.')) {
+    return false;
+  }
+
+  const suffix = pattern.slice(1).toLowerCase();
+  return hostname.endsWith(suffix);
+};
+
+const isOriginAllowed = (origin) => {
+  if (!origin) {
+    return true;
+  }
+
+  const normalizedOrigin = origin.toLowerCase();
+  const configured = env.corsAllowedOrigins || [];
+
+  if (configured.includes('*') || configured.includes(normalizedOrigin)) {
+    return true;
+  }
+
+  const hostname = safeHostname(origin);
+
+  // Deployment-friendly defaults to avoid false CORS blocks.
+  const trustedHostPatterns = ['localhost', '127.0.0.1', '*.azurewebsites.net', '*.azurestaticapps.net', '*.vercel.app'];
+
+  if (trustedHostPatterns.includes(hostname)) {
+    return true;
+  }
+
+  return trustedHostPatterns.some((pattern) => wildcardHostMatches(hostname, pattern));
+};
+
 app.use(helmet());
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (env.corsAllowedOrigins.includes(origin)) {
+      if (isOriginAllowed(origin)) {
         return callback(null, true);
       }
 
