@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -24,9 +25,9 @@ export default function Campus360Viewer() {
       <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div className="border-l-4 border-blue-600 pl-4">
           <h3 className="text-3xl font-bold text-slate-900 dark:text-white">🏫 360° Campus View</h3>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300\">Drag horizontally to explore the campus.</p>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Drag horizontally to explore the campus.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {spots.map((spot, index) => (
             <button
               key={spot.name}
@@ -43,6 +44,9 @@ export default function Campus360Viewer() {
               {spot.name}
             </button>
           ))}
+          <Link href="/tour" className="rounded-full border-2 border-blue-300 bg-white px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-50 dark:border-blue-700/50 dark:bg-slate-800 dark:text-blue-300">
+            Full Screen Tour
+          </Link>
         </div>
       </div>
 

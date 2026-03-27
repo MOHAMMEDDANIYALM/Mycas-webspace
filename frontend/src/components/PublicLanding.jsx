@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import PublicNavbar from 'components/public/PublicNavbar';
 import PublicFooter from 'components/public/PublicFooter';
+import Campus360Viewer from 'components/public/Campus360Viewer';
 import SectionReveal from 'components/ui/SectionReveal';
 
 export default function PublicLanding() {
@@ -67,6 +68,12 @@ export default function PublicLanding() {
                 >
                   Learn More
                 </Link>
+                <Link
+                  href="#campus-tour"
+                  className="rounded-lg border-2 border-blue-200 bg-white px-8 py-3 font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50"
+                >
+                  360 Tour
+                </Link>
               </div>
 
               <div className="flex gap-8 pt-4">
@@ -90,7 +97,7 @@ export default function PublicLanding() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
+              className="relative space-y-4"
             >
               <div className="relative rounded-2xl bg-gradient-to-br from-blue-100 to-blue-50 p-8 shadow-2xl">
                 <div className="flex h-96 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 text-7xl">
@@ -101,10 +108,32 @@ export default function PublicLanding() {
                 <p className="text-sm font-semibold text-slate-900">Smart Learning</p>
                 <p className="text-xs text-slate-600">Join our community</p>
               </div>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="rounded-xl border border-blue-200 bg-white p-4 shadow-sm">
+                  <p className="text-xl font-bold text-blue-600">100%</p>
+                  <p className="text-xs text-slate-600">Happy Learners</p>
+                </div>
+                <div className="rounded-xl border border-blue-200 bg-white p-4 shadow-sm">
+                  <p className="text-xl font-bold text-blue-600">24/7</p>
+                  <p className="text-xs text-slate-600">Portal Access</p>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
+
+      <SectionReveal id="campus-tour" className="bg-gradient-to-b from-white to-blue-50/30 px-4 py-16 md:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">Explore Campus In 360°</h2>
+            <Link href="/tour" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-blue-600">
+              Open Full Tour
+            </Link>
+          </div>
+          <Campus360Viewer />
+        </div>
+      </SectionReveal>
 
       {/* Popular Subjects Section */}
       <SectionReveal className="bg-white px-4 py-20 md:py-32">

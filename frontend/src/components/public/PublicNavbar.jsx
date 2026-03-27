@@ -9,6 +9,7 @@ const links = [
   { href: '/about', label: 'About' },
   { href: '/departments', label: 'Programs' },
   { href: '/admission', label: 'Admissions' },
+  { href: '/tour', label: '360 Tour' },
   { href: '/faculty', label: 'Faculty' },
   { href: '/contact', label: 'Contact' }
 ];
