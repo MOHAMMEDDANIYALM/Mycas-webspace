@@ -10,6 +10,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY src ./src
 COPY scripts ./scripts
+COPY emails.xlsx ./emails.xlsx
 
 EXPOSE 8080
 
