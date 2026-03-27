@@ -54,17 +54,17 @@ export default function AdmissionsWizard() {
     <SectionReveal className="mx-auto max-w-4xl px-4 py-16 md:px-6">
       <GlassCard className="border-2 border-blue-200 bg-gradient-to-br from-white to-blue-50/40 dark:border-blue-800/50 dark:from-slate-800 dark:to-blue-900/30">
         <div className="mb-8 border-l-4 border-blue-600 pl-4">
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white\">📝 Admissions Portal</h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300\">Complete your application in a simple multi-step flow.</p>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">📝 Admissions Portal</h1>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Complete your application in a simple multi-step flow.</p>
         </div>
 
-        <div className=\"mb-8\">
-          <div className=\"mb-4 flex items-center justify-between text-sm font-bold uppercase tracking-widest text-blue-600 dark:text-blue-300\">
+        <div className="mb-8">
+          <div className="mb-4 flex items-center justify-between text-sm font-bold uppercase tracking-widest text-blue-600 dark:text-blue-300">
             <span>Step {step + 1} of {steps.length}</span>
-            <span className=\"rounded-full bg-blue-100 px-3 py-1 text-xs dark:bg-blue-900/40\">{steps[step]}</span>
+            <span className="rounded-full bg-blue-100 px-3 py-1 text-xs dark:bg-blue-900/40">{steps[step]}</span>
           </div>
-          <div className=\"h-3 w-full overflow-hidden rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 ring-1 ring-blue-200 dark:from-blue-900/30 dark:to-indigo-900/30 dark:ring-blue-800/50\">
-            <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.35 }} className=\"h-full bg-gradient-to-r from-blue-600 to-blue-500\" />
+          <div className="h-3 w-full overflow-hidden rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 ring-1 ring-blue-200 dark:from-blue-900/30 dark:to-indigo-900/30 dark:ring-blue-800/50">
+            <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.35 }} className="h-full bg-gradient-to-r from-blue-600 to-blue-500" />
           </div>
         </div>
 
@@ -80,52 +80,46 @@ export default function AdmissionsWizard() {
             )}
 
             {step === 1 && (
-              <motion.div key="step-2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="grid gap-4 md:grid-cols-2">
-                <SelectField label="Current Qualification" name="qualifications" value={formData.qualifications} onChange={updateField} options={['12th', 'Diploma', 'Bachelor Degree']} />
-                <SelectField label="Preferred Department" name="preferredDepartment" value={formData.preferredDepartment} onChange={updateField} options={['PU', 'UG']} />
-                <SelectField label="Preferred Program" name="preferredProgram" value={formData.preferredProgram} onChange={updateField} options={['BCA', 'BBA', 'B.Com', 'Financial Management', 'PU Commerce', 'PU Science - PCMC', 'PU Science - PCMB']} />
-                <div className="md:col-span-2">
-                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">Additional Notes</label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={updateField}
-                    rows={4}
-                    className="w-full rounded-xl border border-blue-200 bg-white/80 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900"
-                  />
+              <motion.div key="step-2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <Field label="Qualifications" name="qualifications" value={formData.qualifications} onChange={updateField} required />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200">Preferred Department</label>
+                    <select name="preferredDepartment" value={formData.preferredDepartment} onChange={updateField} className="w-full rounded-lg border-2 border-blue-300 bg-white px-4 py-3 text-sm transition focus:border-blue-500 focus:outline-none dark:border-blue-700/50 dark:bg-slate-800">
+                      <option>UG</option>
+                      <option>PU</option>
+                    </select>
+                  </div>
+                  <Field label="Preferred Program" name="preferredProgram" value={formData.preferredProgram} onChange={updateField} />
                 </div>
               </motion.div>
             )}
 
             {step === 2 && (
-              <motion.div key="step-3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-3 text-sm">
-                {Object.entries(formData).map(([key, value]) => (
-                  <div key={key} className="rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{key}</p>
-                    <p className="mt-1 text-slate-800 dark:text-slate-100">{value || '—'}</p>
-                  </div>
-                ))}
+              <motion.div key="step-3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-3">
+                <ReviewItem label="Full Name" value={formData.fullName} />
+                <ReviewItem label="Email" value={formData.email} />
+                <ReviewItem label="Phone" value={formData.phone} />
+                <ReviewItem label="Qualifications" value={formData.qualifications} />
+                <ReviewItem label="Preferred Department" value={formData.preferredDepartment} />
+                <ReviewItem label="Preferred Program" value={formData.preferredProgram} />
               </motion.div>
             )}
           </AnimatePresence>
 
-          <div className="flex items-center justify-between pt-2">
-            <button
-              type="button"
-              onClick={previousStep}
-              disabled={step === 0}
-              className="rounded-full border border-blue-200 px-5 py-2 text-sm font-semibold text-blue-700 transition disabled:opacity-40 dark:border-slate-700 dark:text-slate-200"
-            >
-              Previous
-            </button>
-
+          <div className="flex gap-3 pt-6">
+            {step > 0 && (
+              <button type="button" onClick={previousStep} className="rounded-lg border-2 border-blue-300 px-6 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50 dark:border-blue-700/50 dark:text-blue-300 dark:hover:bg-blue-900/30">
+                ← Previous
+              </button>
+            )}
             {step < steps.length - 1 ? (
-              <button type="button" onClick={nextStep} className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
-                Continue
+              <button type="button" onClick={nextStep} className="flex-1 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-bold text-white transition hover:from-blue-700 hover:to-blue-600">
+                Next →
               </button>
             ) : (
-              <button type="submit" disabled={isSubmitting} className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50">
-                {isSubmitting ? 'Submitting...' : 'Submit Application'}
+              <button type="submit" disabled={isSubmitting} className="flex-1 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-md shadow-green-500/30 transition hover:from-green-700 hover:to-emerald-600 disabled:opacity-60">
+                {isSubmitting ? '⏳ Submitting...' : '✅ Submit Application'}
               </button>
             )}
           </div>
@@ -135,38 +129,27 @@ export default function AdmissionsWizard() {
   );
 }
 
-function Field({ label, name, value, onChange, type = 'text', required = false }) {
+function Field({ label, type = 'text', name, value, onChange, required = false }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">{label}</label>
+      <label className="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200">{label}</label>
       <input
+        type={type}
         name={name}
         value={value}
-        type={type}
-        required={required}
         onChange={onChange}
-        className="w-full rounded-xl border border-blue-200 bg-white/80 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900"
+        required={required}
+        className="w-full rounded-lg border-2 border-blue-300 bg-white px-4 py-3 text-sm placeholder-slate-400 transition focus:border-blue-500 focus:outline-none dark:border-blue-700/50 dark:bg-slate-800"
       />
     </div>
   );
 }
 
-function SelectField({ label, name, value, onChange, options }) {
+function ReviewItem({ label, value }) {
   return (
-    <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">{label}</label>
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="w-full rounded-xl border border-blue-200 bg-white/80 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+    <div className="rounded-lg border-l-4 border-blue-600 bg-blue-50/40 p-4 dark:bg-blue-900/20">
+      <p className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{value}</p>
     </div>
   );
 }
