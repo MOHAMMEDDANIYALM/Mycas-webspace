@@ -170,6 +170,7 @@ export default function EventsPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
       <div className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-black" />
         <video
           className="h-full w-full object-cover"
           src="/background.mp4"
@@ -177,6 +178,7 @@ export default function EventsPage() {
           loop
           muted
           playsInline
+          preload="auto"
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-black/62" />
@@ -196,6 +198,7 @@ export default function EventsPage() {
           onMouseMove={revealUiTemporarily}
           onTouchStart={revealUiTemporarily}
         >
+          <div className="absolute inset-0 bg-black" />
           <video
             ref={videoRef}
             key={activeVideo.src}
@@ -204,6 +207,7 @@ export default function EventsPage() {
             autoPlay
             muted={isMuted}
             playsInline
+            preload="auto"
             onEnded={showNext}
             onTimeUpdate={handleTimeUpdate}
             onPlay={() => setIsPlaying(true)}
@@ -284,7 +288,7 @@ export default function EventsPage() {
       </section>
 
       <div className="relative z-20">
-        <PublicFooter className="border-white/10 bg-black/80" />
+        <PublicFooter />
       </div>
     </main>
   );
