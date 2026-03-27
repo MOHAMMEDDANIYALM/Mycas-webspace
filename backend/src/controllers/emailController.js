@@ -2,6 +2,8 @@ const { User } = require('../models/User');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendBulkEmailInBatches } = require('../utils/emailService');
+const { loadExcelDirectory } = require('../utils/excelDirectory');
+const mongoose = require('mongoose');
 
 const sendBulkEmail = asyncHandler(async (req, res) => {
   const { classCode, subject, message } = req.body;
@@ -34,12 +36,29 @@ const sendBulkEmail = asyncHandler(async (req, res) => {
 
   const normalizedClassCode = classCode.trim().toUpperCase();
 
-  const students = await User.find({
-    role: 'student',
-    $or: [{ classId: normalizedClassCode }, { classCode: normalizedClassCode }]
-  }).select('email');
+  let recipients = [];
+  const dbConnected = mongoose.connection.readyState === 1;
 
-  const recipients = students.map((student) => student.email).filter(Boolean);
+  if (dbConnected) {
+    try {
+      const students = await User.find({
+        role: 'student',
+        $or: [{ classId: normalizedClassCode }, { classCode: normalizedClassCode }]
+      }).select('email');
+
+      recipients = students.map((student) => student.email).filter(Boolean);
+    } catch (error) {
+      console.error('Bulk email DB lookup failed, falling back to Excel directory:', error.message);
+    }
+  }
+
+  if (recipients.length === 0) {
+    const excelRows = loadExcelDirectory();
+    recipients = excelRows
+      .filter((row) => row.role === 'student' && row.classCode === normalizedClassCode)
+      .map((row) => row.email)
+      .filter(Boolean);
+  }
 
   if (recipients.length === 0) {
     throw new AppError('No student emails found for this class.', 404);
