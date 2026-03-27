@@ -1,140 +1,267 @@
 'use client';
 
-import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import PublicNavbar from 'components/public/PublicNavbar';
 import PublicFooter from 'components/public/PublicFooter';
-import SectionReveal from 'components/ui/SectionReveal';
-import GlassCard from 'components/ui/GlassCard';
 
-const upcomingEvents = [
-  { icon: '🎓', title: 'Annual Convocation', date: 'April 15, 2026', location: 'Main Campus', image: '/event1.jpg' },
-  { icon: '🏆', title: 'Sports Championship', date: 'April 22, 2026', location: 'Sports Complex', image: '/event2.jpg' },
-  { icon: '🎬', title: 'Cultural Fest', date: 'May 5, 2026', location: 'Auditorium', image: '/event3.jpg' },
-  { icon: '💻', title: 'Tech Summit', date: 'May 20, 2026', location: 'Innovation Center', image: '/event4.jpg' }
+const eventVideos = [
+  { src: '/ethnic_day.mp4', title: 'Ethnic Day' },
+  { src: '/mehandi_in_mycas.mp4', title: 'Mehandi In Mycas' },
+  { src: '/my_flames.mp4', title: 'My Flames' }
 ];
 
 export default function EventsPage() {
+  const videoRef = useRef(null);
+  const hideUiTimerRef = useRef(null);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showUi, setShowUi] = useState(true);
+  const [progress, setProgress] = useState(0);
+
+  const showNext = () => {
+    setProgress(0);
+    setActiveVideoIndex((current) => (current + 1) % eventVideos.length);
+  };
+
+  const showPrevious = () => {
+    setProgress(0);
+    setActiveVideoIndex((current) => (current - 1 + eventVideos.length) % eventVideos.length);
+  };
+
+  const jumpToVideo = (index) => {
+    setProgress(0);
+    setActiveVideoIndex(index);
+  };
+
+  useEffect(() => {
+    const handleKeydown = (event) => {
+      if (event.key === 'ArrowRight') {
+        showNext();
+      }
+
+      if (event.key === 'ArrowLeft') {
+        showPrevious();
+      }
+
+      if (event.key === ' ') {
+        event.preventDefault();
+        togglePlayback();
+      }
+
+      if (event.key.toLowerCase() === 'm') {
+        setIsMuted((current) => !current);
+      }
+
+      if (event.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (hideUiTimerRef.current) {
+      clearTimeout(hideUiTimerRef.current);
+      hideUiTimerRef.current = null;
+    }
+
+    if (!isPlaying) {
+      setShowUi(true);
+      return;
+    }
+
+    hideUiTimerRef.current = setTimeout(() => {
+      setShowUi(false);
+    }, 2500);
+
+    return () => {
+      if (hideUiTimerRef.current) {
+        clearTimeout(hideUiTimerRef.current);
+        hideUiTimerRef.current = null;
+      }
+    };
+  }, [activeVideoIndex, isPlaying]);
+
+  const revealUiTemporarily = () => {
+    setShowUi(true);
+
+    if (hideUiTimerRef.current) {
+      clearTimeout(hideUiTimerRef.current);
+      hideUiTimerRef.current = null;
+    }
+
+    if (isPlaying) {
+      hideUiTimerRef.current = setTimeout(() => {
+        setShowUi(false);
+      }, 2500);
+    }
+  };
+
+  const togglePlayback = () => {
+    const player = videoRef.current;
+
+    if (!player) {
+      return;
+    }
+
+    if (player.paused) {
+      player.play();
+      setIsPlaying(true);
+    } else {
+      player.pause();
+      setIsPlaying(false);
+      setShowUi(true);
+    }
+  };
+
+  const toggleFullscreen = async () => {
+    const player = videoRef.current;
+
+    if (!player) {
+      return;
+    }
+
+    try {
+      if (!document.fullscreenElement) {
+        await player.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    const player = videoRef.current;
+
+    if (!player || !player.duration) {
+      setProgress(0);
+      return;
+    }
+
+    setProgress((player.currentTime / player.duration) * 100);
+  };
+
+  const activeVideo = eventVideos[activeVideoIndex];
+
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-black">
       <PublicNavbar />
 
-      {/* Hero Section */}
-      <SectionReveal className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 px-4 py-12 md:py-24">
-        <div className="mx-auto max-w-7xl text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900">
-            🎬 Upcoming Events & Videos
-          </h1>
-          <p className="mt-4 text-lg text-slate-600">
-            Stay updated with all campus events and video highlights
-          </p>
-        </div>
-      </SectionReveal>
+      <section className="relative bg-black">
+        <motion.div
+          key={activeVideo.src}
+          initial={{ opacity: 0.2, scale: 1.02 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.55 }}
+          className="relative h-[100svh] w-full"
+          onMouseMove={revealUiTemporarily}
+          onTouchStart={revealUiTemporarily}
+        >
+          <video
+            ref={videoRef}
+            key={activeVideo.src}
+            className="h-full w-full object-cover"
+            src={activeVideo.src}
+            autoPlay
+            muted={isMuted}
+            playsInline
+            onEnded={showNext}
+            onTimeUpdate={handleTimeUpdate}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onClick={togglePlayback}
+          />
 
-      {/* Upcoming Events Section */}
-      <SectionReveal className="px-4 py-12 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-12 text-center">
-            Upcoming Events
-          </h2>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/45" />
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-            {upcomingEvents.map((event, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-              >
-                <GlassCard className="overflow-hidden border-2 border-blue-200 hover:shadow-lg transition">
-                  <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-6 sm:p-8 min-h-[200px] flex items-center justify-center">
-                    <div className="text-6xl md:text-8xl">{event.icon}</div>
-                  </div>
-                  <div className="p-4 md:p-6">
-                    <h3 className="text-xl md:text-2xl font-bold text-slate-900">{event.title}</h3>
-                    <div className="mt-3 space-y-2 text-sm">
-                      <p className="flex items-center gap-2 text-slate-600">
-                        <span>📅</span> {event.date}
-                      </p>
-                      <p className="flex items-center gap-2 text-slate-600">
-                        <span>📍</span> {event.location}
-                      </p>
-                    </div>
-                    <button className="mt-4 w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2 text-sm font-semibold text-white transition hover:from-blue-700 hover:to-blue-600">
-                      Learn More
-                    </button>
-                  </div>
-                </GlassCard>
-              </motion.div>
-            ))}
+          <div className={`absolute left-0 right-0 top-0 h-1 bg-white/15 transition-opacity duration-300 ${showUi ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="h-full bg-white transition-all duration-150" style={{ width: `${progress}%` }} />
           </div>
-        </div>
-      </SectionReveal>
 
-      {/* Event Videos Section */}
-      <SectionReveal className="bg-gradient-to-br from-blue-50 to-white px-4 py-12 md:py-24">
-        <div className="mx-auto max-w-7xl">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-12 text-center">
-            Event Highlights & Videos
-          </h2>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              { title: 'Annual Day 2025', duration: '15:30' },
-              { title: 'Orientation Program', duration: '22:45' },
-              { title: 'Graduation Ceremony', duration: '18:20' },
-              { title: 'Sports Meet Highlights', duration: '12:10' },
-              { title: 'Talent Shows', duration: '25:35' },
-              { title: 'Campus Tour', duration: '8:50' }
-            ].map((video, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition cursor-pointer"
+          <div className={`absolute inset-x-0 top-0 flex items-center justify-between px-4 py-4 transition-opacity duration-300 md:px-8 md:py-6 ${showUi ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <p className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold text-white md:text-sm">
+              Now Playing: {activeVideo.title}
+            </p>
+            <div className="flex items-center gap-2">
+              <p className="rounded-full bg-black/45 px-3 py-1 text-xs font-semibold text-white md:text-sm">
+                {activeVideoIndex + 1} / {eventVideos.length}
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsMuted((current) => !current)}
+                className="rounded-full border border-white/45 bg-black/45 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition hover:bg-black/70 md:text-sm"
               >
-                <div className="bg-gradient-to-br from-blue-400 to-blue-600 h-40 flex items-center justify-center relative group">
-                  <div className="text-5xl">🎥</div>
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition flex items-center justify-center">
-                    <div className="text-4xl opacity-0 group-hover:opacity-100 transition">▶️</div>
-                  </div>
-                </div>
-                <div className="bg-white p-4">
-                  <h3 className="font-bold text-slate-900">{video.title}</h3>
-                  <p className="text-xs text-slate-600 mt-1">Duration: {video.duration}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </SectionReveal>
-
-      {/* Add Event Form */}
-      <SectionReveal className="px-4 py-12 md:py-24">
-        <div className="mx-auto max-w-2xl">
-          <GlassCard className="border-2 border-blue-200">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">Upload Event Video</h2>
-            <form className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Event Title</label>
-                <input type="text" placeholder="Enter event title" className="w-full rounded-lg border-2 border-blue-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Video URL</label>
-                <input type="url" placeholder="https://youtube.com/..." className="w-full rounded-lg border-2 border-blue-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Description</label>
-                <textarea placeholder="Describe the event..." rows="4" className="w-full rounded-lg border-2 border-blue-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none"></textarea>
-              </div>
-              <button type="submit" className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/30 transition hover:from-blue-700 hover:to-blue-600">
-                Upload Video
+                {isMuted ? 'Unmute' : 'Mute'}
               </button>
-            </form>
-          </GlassCard>
-        </div>
-      </SectionReveal>
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                className="rounded-full border border-white/45 bg-black/45 px-3 py-1 text-xs font-semibold text-white backdrop-blur transition hover:bg-black/70 md:text-sm"
+              >
+                {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              </button>
+            </div>
+          </div>
+
+          <div className={`absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 px-4 pb-8 transition-opacity duration-300 md:px-8 md:pb-10 ${showUi ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <button
+              type="button"
+              onClick={showPrevious}
+              className="rounded-full border border-white/45 bg-black/45 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-black/70"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={showNext}
+              className="rounded-full border border-white/45 bg-black/45 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-black/70"
+            >
+              Next
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={togglePlayback}
+            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/50 bg-black/45 px-5 py-2 text-sm font-semibold text-white backdrop-blur transition ${showUi ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          >
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+
+          <div className={`absolute left-1/2 top-[58%] flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-black/40 px-3 py-2 backdrop-blur transition-opacity duration-300 ${showUi ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            {eventVideos.map((video, index) => (
+              <button
+                key={video.src}
+                type="button"
+                onClick={() => jumpToVideo(index)}
+                aria-label={`Play ${video.title}`}
+                className={`h-2.5 w-2.5 rounded-full transition ${
+                  index === activeVideoIndex ? 'bg-white' : 'bg-white/45 hover:bg-white/70'
+                }`}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </section>
 
       <PublicFooter />
     </main>
