@@ -5,46 +5,40 @@ import { AnimatePresence, motion } from 'framer-motion';
 import GlassCard from 'components/ui/GlassCard';
 
 const roleSections = {
-  student: ['Classes', 'Classroom', 'Attendance', 'Fee Payment', 'Assignments', 'Announcements', 'Resources', 'Profile', 'Notifications'],
-  teacher: ['Classes', 'Attendance', 'Assignments', 'Announcements', 'Email Access'],
-  promo_admin: ['Students', 'Teachers', 'Analytics', 'Fee Overview', 'Settings', 'Activity Feed'],
-  super_admin: ['Students', 'Teachers', 'Analytics', 'Fee Overview', 'Settings', 'Activity Feed']
+  student: ['Profile', 'Timetable', 'Fee Payment', 'Marks', 'Announcements'],
+  teacher: ['Profile', 'Timetable', 'Bulk Email', 'Class Management', 'Announcements'],
+  promo_admin: ['Profile', 'Timetable', 'Bulk Email', 'Class Management', 'Announcements'],
+  super_admin: ['Profile', 'Timetable', 'Bulk Email', 'Class Management', 'Announcements']
 };
 
 const roleCards = {
   student: {
-    Classes: ['Current Semester', 'Timetable slots', 'Course credits'],
-    Classroom: ['Live sessions', 'Recorded materials', 'Discussion threads'],
-    Attendance: ['Monthly attendance', 'Subject-wise trend', 'Shortage alerts'],
-    'Fee Payment': ['Outstanding fees', 'Payment receipts', 'Due-date reminders'],
-    Assignments: ['Upcoming deadlines', 'Submitted work', 'Evaluation status'],
-    Announcements: ['College circulars', 'Exam updates', 'Department notices'],
-    Resources: ['E-books', 'Lab manuals', 'Question banks'],
-    Profile: ['Personal details', 'Academic history', 'Skill interests'],
-    Notifications: ['Priority alerts', 'Class reminders', 'System notifications']
+    Profile: ['Name and course are synced from the Excel directory.', 'Your role controls which tools you can access.'],
+    Timetable: ['Your timetable loads for your class/course automatically.', 'View class slots and schedule updates.'],
+    'Fee Payment': ['Fee payment portal is coming soon.', 'You will be able to pay and download receipts here.'],
+    Marks: ['Internal marks will be published soon.', 'External marks will be published soon.'],
+    Announcements: ['College circulars', 'Exam updates', 'Department notices']
   },
   teacher: {
-    Classes: ['Assigned classes', 'Course plans', 'Academic calendar'],
-    Attendance: ['Daily marking', 'Class analytics', 'Low attendance alerts'],
-    Assignments: ['Upload tasks', 'Submission tracking', 'Evaluation queue'],
-    Announcements: ['Publish notices', 'Class announcements', 'Broadcast updates'],
-    'Email Access': ['Add student email', 'Remove student email', 'Approval status']
+    Profile: ['Name and course are synced from the Excel directory.', 'Teacher/faculty/developer entries get teaching tools.'],
+    Timetable: ['Create, edit, and move class events for class codes.', 'Manage room and timing from calendar actions.'],
+    'Bulk Email': ['Send announcements to students by class code.', 'Useful for urgent updates and reminders.'],
+    'Class Management': ['Change classes using the timetable editor below.', 'Teachers do not have fee or marks panels.'],
+    Announcements: ['Publish notices', 'Class announcements', 'Broadcast updates']
   },
   promo_admin: {
-    Students: ['Admissions status', 'Enrollment trends', 'Student records'],
-    Teachers: ['Faculty directory', 'Department allocation', 'Workload balance'],
-    Analytics: ['Academic KPIs', 'Attendance metrics', 'Program performance'],
-    'Fee Overview': ['Collections summary', 'Pending dues', 'Payment channels'],
-    Settings: ['Role permissions', 'Workflow controls', 'Portal preferences'],
-    'Activity Feed': ['Latest actions', 'System logs', 'Important alerts']
+    Profile: ['Directory-backed profile with admin privileges.', 'Can manage users and academic operations.'],
+    Timetable: ['Create, edit, and move class events for class codes.', 'Control schedules across departments.'],
+    'Bulk Email': ['Send announcements to students by class code.', 'Supports multi-class communication workflows.'],
+    'Class Management': ['Change classes and schedules from timetable.', 'Resolve timetable conflicts quickly.'],
+    Announcements: ['System-wide updates', 'Department notices', 'Staff communications']
   },
   super_admin: {
-    Students: ['Admissions status', 'Enrollment trends', 'Student records'],
-    Teachers: ['Faculty directory', 'Department allocation', 'Workload balance'],
-    Analytics: ['Academic KPIs', 'Attendance metrics', 'Program performance'],
-    'Fee Overview': ['Collections summary', 'Pending dues', 'Payment channels'],
-    Settings: ['Role permissions', 'Workflow controls', 'Portal preferences'],
-    'Activity Feed': ['Latest actions', 'System logs', 'Important alerts']
+    Profile: ['Directory-backed profile with super admin privileges.', 'Can manage users and academic operations.'],
+    Timetable: ['Create, edit, and move class events for class codes.', 'Control schedules across departments.'],
+    'Bulk Email': ['Send announcements to students by class code.', 'Supports multi-class communication workflows.'],
+    'Class Management': ['Change classes and schedules from timetable.', 'Resolve timetable conflicts quickly.'],
+    Announcements: ['System-wide updates', 'Department notices', 'Staff communications']
   }
 };
 
@@ -52,6 +46,8 @@ export default function ImmersiveDashboard({ user, onLogout }) {
   const sections = roleSections[user?.role] || ['Overview'];
   const [activeSection, setActiveSection] = useState(sections[0]);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const isStudent = user?.role === 'student';
+  const displayCourse = user?.course || user?.classCode || 'Not assigned yet';
 
   const cards = useMemo(() => {
     const role = user?.role || 'student';
@@ -78,6 +74,7 @@ export default function ImmersiveDashboard({ user, onLogout }) {
           <div className="mb-5 rounded-2xl border border-blue-100/80 bg-gradient-to-r from-blue-50/80 to-indigo-50/60 p-3 text-xs dark:border-slate-700 dark:from-slate-800 dark:to-slate-900">
             <p className="font-semibold text-blue-900 dark:text-white">{user?.fullName}</p>
             <p className="mt-1 capitalize text-slate-600 dark:text-slate-300">{user?.role?.replace('_', ' ')}</p>
+            <p className="mt-1 text-slate-600 dark:text-slate-300">Course: {displayCourse}</p>
           </div>
 
           <nav className="space-y-2">
@@ -113,21 +110,37 @@ export default function ImmersiveDashboard({ user, onLogout }) {
 
           <div className="mb-4 rounded-3xl border border-white/60 bg-white/55 p-5 shadow-[0_20px_45px_rgba(37,99,235,0.2)] backdrop-blur-xl dark:border-blue-100/10 dark:bg-slate-900/65">
             <h1 className="text-2xl font-semibold text-slate-800 dark:text-white md:text-3xl">Welcome Back, {user?.fullName?.split(' ')[0] || 'Student'}.</h1>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Your live workspace for classes, fees, attendance, and actions.</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              Profile synced from Excel: {user?.fullName || 'N/A'} • {displayCourse} • {user?.email || 'N/A'}
+            </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="rounded-xl bg-blue-600/90 px-4 py-3 text-white">
-                <p className="text-xs uppercase tracking-wide text-blue-100">Attendance</p>
-                <p className="mt-1 text-xl font-semibold">92%</p>
+                <p className="text-xs uppercase tracking-wide text-blue-100">Role</p>
+                <p className="mt-1 text-xl font-semibold capitalize">{user?.role?.replace('_', ' ') || 'student'}</p>
               </div>
               <div className="rounded-xl bg-white/80 px-4 py-3 text-slate-700 ring-1 ring-blue-100 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700">
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Pending</p>
-                <p className="mt-1 text-xl font-semibold">3 Tasks</p>
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Timetable</p>
+                <p className="mt-1 text-xl font-semibold">{displayCourse}</p>
               </div>
               <div className="rounded-xl bg-white/80 px-4 py-3 text-slate-700 ring-1 ring-blue-100 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700">
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Fees</p>
-                <p className="mt-1 text-xl font-semibold">₹ 1,200</p>
+                {isStudent ? (
+                  <>
+                    <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Fees</p>
+                    <p className="mt-1 text-xl font-semibold">Coming soon</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-300">Faculty Tools</p>
+                    <p className="mt-1 text-xl font-semibold">Enabled</p>
+                  </>
+                )}
               </div>
             </div>
+            {isStudent ? (
+              <div className="mt-3 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-800 ring-1 ring-blue-200 dark:bg-slate-800 dark:text-blue-200 dark:ring-slate-700">
+                Internal and external marks will be published soon.
+              </div>
+            ) : null}
           </div>
 
           <AnimatePresence mode="wait">

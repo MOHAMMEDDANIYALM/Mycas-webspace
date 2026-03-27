@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import AuthGuard from 'components/AuthGuard';
 import ImmersiveDashboard from 'components/dashboard/ImmersiveDashboard';
 import EmailDirectoryManager from 'components/EmailDirectoryManager';
+import TimetableCalendar from 'components/TimetableCalendar';
+import BulkEmailForm from 'components/BulkEmailForm';
 import { useAuth } from 'providers/AuthProvider';
 
 export default function DashboardPage() {
@@ -21,6 +23,8 @@ export default function DashboardPage() {
     <AuthGuard>
       <ImmersiveDashboard user={user} onLogout={handleLogout} />
       <div className="mx-auto max-w-7xl px-3 pb-8 md:px-6">
+        <TimetableCalendar role={user?.role} defaultClassCode={user?.classCode || user?.course || 'BCA'} />
+        <BulkEmailForm role={user?.role} />
         <EmailDirectoryManager role={user?.role} />
       </div>
     </AuthGuard>

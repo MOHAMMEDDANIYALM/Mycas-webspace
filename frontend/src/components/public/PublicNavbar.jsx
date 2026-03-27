@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import ThemeToggle from 'components/ThemeToggle';
+import { useAuth } from 'providers/AuthProvider';
 
 const links = [
   { href: '/', label: 'Home' },
@@ -15,6 +15,8 @@ const links = [
 ];
 
 export default function PublicNavbar() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <nav className="sticky top-0 z-50 border-b-2 border-blue-200/60 bg-gradient-to-r from-white via-blue-50/40 to-white/80 shadow-sm backdrop-blur-xl dark:border-blue-800/40 dark:from-slate-900 dark:via-blue-950/40 dark:to-slate-900/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
@@ -34,16 +36,28 @@ export default function PublicNavbar() {
           ))}
           <div className="h-6 border-l-2 border-blue-200 dark:border-blue-800/50" />
           <ThemeToggle />
-          <Link href="/login" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-blue-600">
-            Sign In
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/dashboard" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-blue-600">
+              Profile
+            </Link>
+          ) : (
+            <Link href="/login" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition hover:from-blue-700 hover:to-blue-600">
+              Sign In
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-3 md:hidden">
           <ThemeToggle />
-          <Link href="/login" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-3 py-1.5 text-xs font-bold text-white transition hover:from-blue-700 hover:to-blue-600">
-            Sign In
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/dashboard" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-3 py-1.5 text-xs font-bold text-white transition hover:from-blue-700 hover:to-blue-600">
+              Profile
+            </Link>
+          ) : (
+            <Link href="/login" className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-3 py-1.5 text-xs font-bold text-white transition hover:from-blue-700 hover:to-blue-600">
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>

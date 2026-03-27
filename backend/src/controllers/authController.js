@@ -5,6 +5,7 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/token');
 const { hashToken } = require('../utils/crypto');
+const { findExcelContactByEmail } = require('../utils/excelDirectory');
 
 const cookieOptions = {
   httpOnly: true,
@@ -60,7 +61,8 @@ const sanitizeUser = (user) => ({
   email: user.email,
   role: user.role,
   classCode: user.classCode || '',
-  classId: user.classId || ''
+  classId: user.classId || '',
+  course: user.course || ''
 });
 
 const register = asyncHandler(async (req, res) => {
@@ -80,7 +82,8 @@ const login = asyncHandler(async (req, res) => {
     throw new AppError('A valid email is required.', 400);
   }
 
-  const directoryContact = await EmailDirectoryContact.findOne({ email: normalizedEmail });
+  const excelContact = findExcelContactByEmail(normalizedEmail);
+  const directoryContact = excelContact || (await EmailDirectoryContact.findOne({ email: normalizedEmail }));
 
   if (!directoryContact) {
     throw new AppError('Email is not in the approved directory.', 403);
@@ -94,13 +97,15 @@ const login = asyncHandler(async (req, res) => {
       email: normalizedEmail,
       role: directoryContact.role,
       classCode: directoryContact.classCode || '',
-      classId: directoryContact.classCode || ''
+      classId: directoryContact.classCode || '',
+      course: directoryContact.course || directoryContact.classCode || ''
     });
   } else {
     const privilegedRoles = ['promo_admin', 'super_admin'];
     user.fullName = directoryContact.fullName;
     user.classCode = directoryContact.classCode || '';
     user.classId = directoryContact.classCode || '';
+    user.course = directoryContact.course || directoryContact.classCode || '';
 
     if (!privilegedRoles.includes(user.role)) {
       user.role = directoryContact.role;

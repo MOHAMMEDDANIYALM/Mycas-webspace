@@ -62,6 +62,12 @@ const userSchema = new mongoose.Schema(
       maxlength: 40,
       default: ''
     },
+    course: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: ''
+    },
     refreshTokens: {
       type: [refreshTokenSchema],
       default: []

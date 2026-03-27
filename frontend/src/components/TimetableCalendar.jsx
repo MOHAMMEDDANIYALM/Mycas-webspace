@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,12 +11,23 @@ import { useAuth } from 'providers/AuthProvider';
 
 const editableRoles = ['teacher', 'promo_admin', 'super_admin'];
 
-export default function TimetableCalendar({ role }) {
+export default function TimetableCalendar({ role, defaultClassCode }) {
   const queryClient = useQueryClient();
   const { authGet, authRequest } = useAuth();
-  const [classCode, setClassCode] = useState('BCA-SEM1');
+  const [classCode, setClassCode] = useState(defaultClassCode || 'BCA-SEM1');
 
   const canEdit = editableRoles.includes(role);
+  const canChangeClassCode = canEdit;
+
+  useEffect(() => {
+    if (!defaultClassCode) {
+      return;
+    }
+
+    if (!canChangeClassCode) {
+      setClassCode(defaultClassCode);
+    }
+  }, [defaultClassCode, canChangeClassCode]);
 
   const timetableQuery = useQuery({
     queryKey: ['timetable', classCode],
@@ -168,6 +179,7 @@ export default function TimetableCalendar({ role }) {
             type="text"
             value={classCode}
             onChange={(event) => setClassCode(event.target.value.toUpperCase())}
+            disabled={!canChangeClassCode}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
             placeholder="e.g. BCA-SEM1"
           />

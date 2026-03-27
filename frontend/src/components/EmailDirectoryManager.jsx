@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useAuth } from 'providers/AuthProvider';
 
-const allowedRoles = ['teacher', 'promo_admin', 'super_admin'];
+const allowedRoles = ['promo_admin', 'super_admin'];
 
 const emptyForm = {
   fullName: '',
